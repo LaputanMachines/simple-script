@@ -66,10 +66,10 @@ class Lexer:
 
             # Tokenize all remaining possible characters
             else:  # Report all illegal chars in stream
-                pos_start = self.position.copy()
+                start_pos = self.position.copy()
                 illegal_character = self.current_character
                 self.advance()  # Note: Advance to ensure pointer doesn't detach
-                return [], IllegalCharError('"' + illegal_character + '"', pos_start, self.position)
+                return [], IllegalCharError('"' + illegal_character + '"', start_pos, self.position)
 
         # Mark end with EOF and return
         tokens.append(Token(TP_EOF))

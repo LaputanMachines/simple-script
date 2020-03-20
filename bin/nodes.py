@@ -11,6 +11,8 @@ class NumberNode:
         :param token: Token instance to use.
         """
         self.token = token
+        self.start_pos = self.token.start_pos
+        self.end_pos = self.token.end_pos
 
     def __repr__(self):
         return '{}'.format(self.token)
@@ -29,6 +31,8 @@ class BinOpNode:
         self.left_node = left_node
         self.op_token = op_token
         self.right_node = right_node
+        self.start_pos = self.left_node.start_pos
+        self.end_pos = self.right_node.end_pos
 
     def __repr__(self):
         return '({}, {}, {})'.format(self.left_node, self.op_token, self.right_node)
@@ -45,6 +49,8 @@ class UnaryOpNode:
         """
         self.op_token = op_token
         self.right_node = right_node
+        self.start_pos = self.op_token.start_pos
+        self.end_pos = self.right_node.end_pos
 
     def __repr__(self):
         return '({}, {})'.format(self.op_token, self.right_node)
