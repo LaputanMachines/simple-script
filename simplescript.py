@@ -1,10 +1,9 @@
 # coding=utf-8
 """Source for the backend of the SimpleScript language."""
 
-import constants
-import errors
-from position import Position
-from token import Token
+from bin import errors, constants
+from bin.position import Position
+from bin.token import Token
 
 
 class Lexer:
