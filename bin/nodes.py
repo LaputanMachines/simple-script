@@ -32,3 +32,19 @@ class BinOpNode:
 
     def __repr__(self):
         return '({}, {}, {})'.format(self.left_node, self.op_token, self.right_node)
+
+
+class UnaryOpNode:
+    """Represents a Node for unary operations."""
+
+    def __init__(self, op_token, right_node):
+        """
+        Initializes the unary operator.
+        :param op_token: Operator Token for the unary operation.
+        :param right_node: Node which has a unary operation.
+        """
+        self.op_token = op_token
+        self.right_node = right_node
+
+    def __repr__(self):
+        return '({}, {})'.format(self.op_token, self.right_node)
