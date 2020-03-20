@@ -22,4 +22,4 @@ python shell.py  # Launches the interactive SimpleScript shell
 
 ---
 
-(c) 2020 Michael Bassili Licensed Under GPL-3.0
+<img src="https://img.shields.io/badge/license-GNU-red.svg" /> <img src="https://img.shields.io/badge/maintainer-FlatlanderWoman-informational.svg" />
