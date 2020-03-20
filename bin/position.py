@@ -20,7 +20,7 @@ class Position:
         self.fn = fn
         self.ftxt = ftxt
 
-    def advance(self, current_char):
+    def advance(self, current_char=None):
         """
         Advance the position of the stream.
         :param current_char: Current char in the stream.
