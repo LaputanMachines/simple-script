@@ -13,10 +13,11 @@ This makes it entirely portable since it does not require the installation of an
 
 ## How To Use
 
-You can use Python to launch the interactive shell. This will allow you to play with the SimpleSCript language in your terminal. You can use the shell to test expressions and functionality.
+You can use Python to launch the interactive shell. This will allow you to play with the SimpleSCript language in your terminal. You can use the shell to test expressions. 
+In your BASH terminal, run the `shell.py` script using Python. 
 
 ```BASH
-python shell.py
+python shell.py  # Launches the interactive SimpleScript shell
 ```
 
 ---
