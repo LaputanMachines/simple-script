@@ -66,6 +66,16 @@ class Number:
         if isinstance(other, Number):
             return Number(self.value * other.value).set_context(self.context), None
 
+    def power_by(self, other):
+        """
+        Raise two Number values together.
+        No possible errors can occur for power operations between Numbers.
+        :param other: Number instance.
+        :return: Number instance with the multiplied value.
+        """
+        if isinstance(other, Number):
+            return Number(self.value ** other.value).set_context(self.context), None
+
     def divide_by(self, other):
         """
         Divide two Number values together.

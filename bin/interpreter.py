@@ -60,6 +60,8 @@ class Interpreter:
             result, error = left_node.add_to(right_node)
         elif node.op_token.type == TP_MINUS:
             result, error = left_node.subtract_by(right_node)
+        elif node.op_token.type == TP_POWER:
+            result, error = left_node.power_by(right_node)
         elif node.op_token.type == TP_MUL:
             result, error = left_node.multiply_by(right_node)
         elif node.op_token.type == TP_DIV:
