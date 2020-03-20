@@ -1,10 +1,18 @@
 # coding=utf-8
 """Interactive shell for SimpleScript programming language"""
 
-title_note = "SimpleScript: Interpreted Programming Language"
-copyright_note = "(c) 2020 Michael Bassili Licensed Under GPL-3.0"
-print(title_note + '\n' + copyright_note + '\n')
+import simplescript
+
+hash_divider = '###################################################'
+title_note = "# SimpleScript: Interpreted Programming Language  #"
+copyright_note = "# (c) 2020 Michael Bassili Licensed Under GPL-3.0 #"
+print('\n' + hash_divider + '\n' + title_note + '\n'
+      + copyright_note + '\n' + hash_divider + '\n')
 
 while True:
-    arg = input('[SimpleScript shell]$ ')
-    print(arg)
+    input_stream = input('[SimpleScript shell]$ ')
+    if input_stream == 'exit':
+        exit(0)  # Terminate from the shell
+    result, error = simplescript.run(input_stream)
+    output_stream = error if error else result
+    print(output_stream)
