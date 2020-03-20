@@ -1,6 +1,7 @@
 # coding=utf-8
 """Source for the backend of the SimpleScript language."""
 
+from bin.parser import Parser
 from bin.tokenizer import Lexer
 
 
@@ -13,4 +14,10 @@ def run(fn, stream):
     """
     lexer = Lexer(stream, fn)
     tokens, error = lexer.tokenize()
-    return tokens, error
+    if error:  # Don't create the AST
+        return None, error  # Tokenization failure
+
+    parser = Parser(tokens)
+    ast = parser.parse()
+
+    return ast.node, ast.error
