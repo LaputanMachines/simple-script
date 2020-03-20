@@ -46,22 +46,22 @@ class Lexer:
 
             # Tokenize all valid operators
             elif self.current_character == '+':
-                tokens.append(Token(TP_PLUS))
+                tokens.append(Token(TP_PLUS, start_pos=self.position))
                 self.advance()
             elif self.current_character == '-':
-                tokens.append(Token(TP_MINUS))
+                tokens.append(Token(TP_MINUS, start_pos=self.position))
                 self.advance()
             elif self.current_character == '*':
-                tokens.append(Token(TP_MUL))
+                tokens.append(Token(TP_MUL, start_pos=self.position))
                 self.advance()
             elif self.current_character == '/':
-                tokens.append(Token(TP_DIV))
+                tokens.append(Token(TP_DIV, start_pos=self.position))
                 self.advance()
             elif self.current_character == '(':
-                tokens.append(Token(TP_LPAREN))
+                tokens.append(Token(TP_LPAREN, start_pos=self.position))
                 self.advance()
             elif self.current_character == ')':
-                tokens.append(Token(TP_RPAREN))
+                tokens.append(Token(TP_RPAREN, start_pos=self.position))
                 self.advance()
 
             # Tokenize all remaining possible characters
@@ -71,6 +71,8 @@ class Lexer:
                 self.advance()  # Note: Advance to ensure pointer doesn't detach
                 return [], IllegalCharError('"' + illegal_character + '"', pos_start, self.position)
 
+        # Mark end with EOF and return
+        tokens.append(Token(TP_EOF))
         return tokens, None
 
     def make_number(self):
@@ -79,6 +81,7 @@ class Lexer:
         :return: Either a TP_FLOAT or a TP_INT number Token instance.
         """
         number_str, dot_count = '', 0
+        start_pos = self.position.copy()
         while self.current_character is not None \
                 and self.current_character in DIGITS + '.':
             if self.current_character == '.':
@@ -87,7 +90,9 @@ class Lexer:
                 dot_count += 1
             number_str += self.current_character
             self.advance()
-        if dot_count == 0:
-            return Token(TP_INT, int(number_str))
-        else:  # Number must be a float
-            return Token(TP_FLOAT, float(number_str))
+
+        # Tokenize the numeric value to INT or FLOAT types
+        if dot_count == 0:  # Tokenize an INT data type
+            return Token(TP_INT, int(number_str), start_pos, self.position)
+        else:  # Must be FLOAT data type
+            return Token(TP_FLOAT, float(number_str), start_pos, self.position)
