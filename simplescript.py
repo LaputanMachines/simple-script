@@ -3,27 +3,30 @@
 
 import constants
 import errors
+from position import Position
 from token import Token
 
 
 class Lexer:
     """The lexical analyzer component of the language."""
 
-    def __init__(self, input_text):
+    def __init__(self, input_text, fn):
         """
         Create instance of a Lexer.
         :param input_text: Input stream to parse using Lexer.
+        :param fn: File name of the document.
         """
         self.text = input_text
-        self.position = -1
+        self.position = Position(-1, 0, -1, fn, input_text)
         self.current_character = None
         self.advance()  # 0-indexed array repr
+        self.fn = fn
 
     def advance(self):
         """Advance the position of the input stream."""
-        self.position += 1
+        self.position.advance(self.current_character)
         self.current_character \
-            = self.text[self.position] if self.position < len(self.text) else None
+            = self.text[self.position.idx] if self.position.idx < len(self.text) else None
 
     def tokenize(self):
         """
@@ -63,9 +66,10 @@ class Lexer:
 
             # Tokenize all remaining possible characters
             else:  # Report all illegal chars in stream
+                pos_start = self.position.copy()
                 illegal_character = self.current_character
                 self.advance()  # Note: Advance to ensure pointer doesn't detach
-                return [], errors.IllegalCharError('"' + illegal_character + '"')
+                return [], errors.IllegalCharError('"' + illegal_character + '"', pos_start, self.position)
 
         return tokens, None
 
@@ -89,12 +93,13 @@ class Lexer:
             return Token(constants.TP_FLOAT, float(number_str))
 
 
-def run(stream):
+def run(fn, stream):
     """
     Execute the Lexer on the text stream.
+    :param fn: File name where stream originates.
     :param stream: Input text stream to parse.
     :return: Stream of Token objects and Error messages.
     """
-    lexer = Lexer(stream)
+    lexer = Lexer(stream, fn)
     tokens, error = lexer.tokenize()
     return tokens, error

@@ -12,7 +12,8 @@ print('\n' + hash_divider + '\n' + title_note + '\n'
 while True:
     input_stream = input('[SimpleScript shell]$ ')
     if input_stream == 'exit':
+        print()  # Newline to separate content
         exit(0)  # Terminate from the shell
-    result, error = simplescript.run(input_stream)
+    result, error = simplescript.run('<stdin>', input_stream)
     output_stream = error if error else result
     print(output_stream)
