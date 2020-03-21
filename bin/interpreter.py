@@ -66,6 +66,10 @@ class Interpreter:
             result, error = left_node.multiply_by(right_node)
         elif node.op_token.type == TP_DIV:
             result, error = left_node.divide_by(right_node)
+        elif node.op_token.type == TP_MODULO:
+            result, error = left_node.modulo_by(right_node)
+        elif node.op_token.type == TP_CLEAN_DIV:
+            result, error = left_node.divide_by(right_node, clean=True)
         if runtime_result.error:
             return runtime_result.failure(runtime_result)
         if error:

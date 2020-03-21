@@ -60,6 +60,12 @@ class Lexer:
             elif self.current_character == '/':
                 tokens.append(Token(TP_DIV, start_pos=self.position))
                 self.advance()
+            elif self.current_character == '|':
+                tokens.append(Token(TP_CLEAN_DIV, start_pos=self.position))
+                self.advance()
+            elif self.current_character == '%':
+                tokens.append(Token(TP_MODULO, start_pos=self.position))
+                self.advance()
             elif self.current_character == '(':
                 tokens.append(Token(TP_LPAREN, start_pos=self.position))
                 self.advance()

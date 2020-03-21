@@ -104,7 +104,7 @@ class Parser:
         Implements the TERM grammar.
         :return: BinOpNode of all possible FACTOR objects.
         """
-        return self.binary_operation(self.factor, [TP_MUL, TP_DIV, TP_POWER])
+        return self.binary_operation(self.factor, [TP_MUL, TP_DIV, TP_POWER, TP_CLEAN_DIV, TP_MODULO])
 
     def expr(self):
         """

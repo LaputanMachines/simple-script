@@ -76,10 +76,25 @@ class Number:
         if isinstance(other, Number):
             return Number(self.value ** other.value).set_context(self.context), None
 
-    def divide_by(self, other):
+    def modulo_by(self, other):
+        """
+        Takes modulo of two Number values.
+        :param other: Number instance.
+        :return: Number instance with the modulo remainder value.
+        """
+        if isinstance(other, Number):
+            if other.value == 0:
+                return None, ActiveRuntimeError('Division by 0 is not allowed.',
+                                                other.start_pos,
+                                                other.end_pos,
+                                                self.context)
+            return Number(self.value % other.value).set_context(self.context), None
+
+    def divide_by(self, other, clean=False):
         """
         Divide two Number values together.
         :param other: Number instance.
+        :param clean: True to perform a clean division.
         :return: Number instance with the divided value.
         """
         if isinstance(other, Number):
@@ -88,7 +103,10 @@ class Number:
                                                 other.start_pos,
                                                 other.end_pos,
                                                 self.context)
-            return Number(self.value / other.value).set_context(self.context), None
+            if clean:  # Perform integer division
+                return Number(self.value // other.value).set_context(self.context), None
+            else:  # Perform regular floating point division
+                return Number(self.value / other.value).set_context(self.context), None
 
     def set_context(self, context=None):
         """
