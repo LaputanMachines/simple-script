@@ -18,7 +18,7 @@ The language is simple to use yet robust enough to support the creation of actua
 ## Installation
 
 Ensure Python 3 is installed on your system. SimpleScript does not use any external libraries.
-This makes it entirely portable since it does not require the installation of any third-party libraries.
+This makes it entirely portable since it does not require the installation of any third-party libraries. **TL;DR: all you need is Python 3 installed on your system.** Nothing else is needed to write and execute SimpleScript programs.
 
 ## How To Use
 
