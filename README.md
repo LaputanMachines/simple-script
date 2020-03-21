@@ -86,6 +86,42 @@ File <stdin>, on line 1
 
 Operations that eventually evaluate into zero are also not allowed, as seen in the above example. In this case, the entire sub-expression is highlighted by the interpreter. This hopefully provides enough tracing and error information to fix the issue in your program. The stack trace will always be displayed in error messages.e," there is a great deal that can be improved upon. I, for one, am less-than-satisfied with much of the variable and function mechanisms of SimpleScript.
 
+## Variables
+
+Variables can be declared by using the `VAR` keyword. Variable names can include letters and underscores in their name. Variables can be re-assigned without restriction. Variables are stored in a symbol table, so they can be mutated and altered throughout execution.
+
+```BASIC
+$ VAR my_variable = 12345
+12345
+$ my_variable
+12345
+```
+
+```BASIC
+$ VAR my_other_variable = 67890
+67890
+$ my_other_variable
+67890
+```
+
+```BASIC
+$ VAR addition = my_variable + my_other_variable
+80235
+$ addition
+80235
+```
+
+Also, variables can be assigned _in the middle of expressions_ which may seem odd to those used to assigning variables before use. However, this can allow one to spawn helper variables in context to one statement instead of having to add to the parent's scope.
+
+```BASIC
+$ VAR x = 10 + (VAR y = 5)   
+15
+$ y
+5
+```
+
+This kind of inline assignment is thanks to the interpretation of the abstract syntax tree (AST). Instead of searching line-by-line for variables to be assigned, SimpleScript simply treats the `VAR` keyword like a token that triggers the parsing of its sub-tree. In short, SimpleScript considers `VAR` definitions a higher priority than brackets in the BEDMAS order of operations.
+
 ## Language Grammars
 
 The SimpleScript language is built around the grammar of BASIC. The grammar was used in the creation of the Lexer and the Parser. It served to inform the design and development of the creation of the abstract syntax trees and their tokens.
