@@ -12,6 +12,7 @@ The language is simple to use yet robust enough to support the creation of actua
   * [How To Use](#how-to-use)
   * [Language Grammars](#language-grammars)
   * [Backend Architecture](#backend-architecture)
+  * [Related Readings](#related-readings)
 
 ---
 
@@ -103,7 +104,22 @@ The process of building and interpreting a programming language from scratch can
 - Parsing: Turns the list of tokens into an abstract syntax tree (AST)
 - Interpreting: Evaluates every node of the AST to return a result
 
-The three components are named accordingly in the `bin/` directory. They are: `lexer.py`, `parser.py`, and `interpreter.py`. These three components are the backbone of (most) programming languages.`
+The three components are named accordingly in the `bin/` directory. They are: `lexer.py`, `parser.py`, and `interpreter.py`. These three components are the backbone of (most) programming languages.
+
+## Related Readings
+
+Here are some of the best physical and digital resources I could find on the subject of creating an interpreter for a programming language from scratch:
+
+* [Language Implementation Patterns: Create Your Own Domain-Specific and General Programming Languages (Pragmatic Programmers)](https://www.amazon.ca/gp/product/193435645X/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=193435645X&linkCode=as2&tag=russblo0b-20&linkId=MP4DCXDV6DJMEJBL)
+* [Writing Compilers and Interpreters: A Software Engineering Approach](https://www.amazon.ca/gp/product/0470177071/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0470177071&linkCode=as2&tag=russblo0b-20&linkId=UCLGQTPIYSWYKRRM)
+* [Modern Compiler Implementation in Java](https://www.amazon.ca/gp/product/052182060X/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=052182060X&linkCode=as2&tag=russblo0b-20&linkId=ZSKKZMV7YWR22NMW)
+* [Modern Compiler Design](https://www.amazon.com/gp/product/1461446988/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1461446988&linkCode=as2&tag=russblo0b-20&linkId=PAXWJP5WCPZ7RKRD)
+* [Compilers: Principles, Techniques, and Tools (2nd Edition)](https://www.amazon.ca/gp/product/0321486811/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0321486811&linkCode=as2&tag=russblo0b-20&linkId=GOEGDQG4HIHU56FQ)
+* [The "Let’s Build A Simple Interpreter" Blog Series](https://ruslanspivak.com/lsbasi-part1/)
+* [The "Make YOUR OWN Programming Language" Video Series](https://www.youtube.com/playlist?list=PLZQftyCk7_SdoVexSmwy_tBgs7P0b97yD)
+* [Introduction to Programming Languages/Interpreted Programs](https://en.wikibooks.org/wiki/Introduction_to_Programming_Languages/Interpreted_Programs)
+
+Hopefully these help inform similar projects in the future. While SimpleScript is "complete," there is a great deal that can be improved upon. I, for one, am less-than-satisfied with much of the variable and function mechanisms of SimpleScript.
 
 ---
 
