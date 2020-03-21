@@ -6,18 +6,6 @@ It's turing complete and is simple to use.
 It is based on the BASIC programming language, and features error highlighting, variables, functions, etc.
 The language is simple to use yet robust enough to support the creation of actual programs.
 
----
-
-* [Installation](#installation)
-* [How To Use](#how-to-use)
-* [All Supported Operators](#all-supported-operators)
-* [Examples Of Math Operations](#examples-of-math-operations)
-* [Language Grammars](#language-grammars)
-* [Backend Architecture](#backend-architecture)
-* [Related Readings](#related-readings)
-
----
-
 ## Installation
 
 Ensure Python 3 is installed on your system. SimpleScript does not use any external libraries.
