@@ -1,4 +1,4 @@
-# SimpleScript: Interpreted Programming Language
+# SimpleScript Programming Language
 
 Interpreted programming language built with Python. 
 Docs and releases are served through GitHub. 
