@@ -93,8 +93,14 @@ func-def    : KEYWORD:FUN IDENTIFIER?
 
 ## Backend Architecture
 
-TODO
+The process of building and interpreting a programming language from scratch can be split into three main components. Each component produces their own deliverable that is used as an input for the following process.
+
+- Lexing: Turns text strings into a list of tokens
+- Parsing: Turns the list of tokens into an abstract syntax tree (AST)
+- Interpreting: Evaluates every node of the AST to return a result
+
+The three components are named accordingly in the `bin/` directory. They are: `lexer.py`, `parser.py`, and `interpreter.py`. These three components are the backbone of (most) programming languages.`
 
 ---
 
-<img src="https://img.shields.io/badge/license-GNU-red.svg" /> <img src="https://img.shields.io/badge/maintainer-FlatlanderWoman-informational.svg" /> <img src="https://img.shields.io/badge/version-1.0-yellow.svg" />
+<img src="https://img.shields.io/badge/license-GNU-red.svg" /> <img src="https://img.shields.io/badge/maintainer-FlatlanderWoman-informational.svg" /> <img src="https://img.shields.io/badge/version-v1.0-yellow.svg" />
