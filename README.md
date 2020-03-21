@@ -39,27 +39,27 @@ Basic arithmetic operations can be performed directly on numbers, variables, and
 
 ```BASIC
 $ (2 + 1) | (4 - 1)
-$ 1
+1
 ```
 
 ```BASIC
 $ 10 % 5
-$ 0
+ 0
 ```
 
 ```BASIC
 $ 1 + 2 - 3 * 4 / 5
-$ 0.6000000000000001
+0.6000000000000001
 ```
 
 ```BASIC
 $ ((1 + 2) * 3 ^ 2) / 2
-$ 13.5
+13.5
 ```
 
 ```BASIC
 $ 10 | 2 + (8 ^ 2) - 6
-$ 63
+63
 ```
 
 As you'd expect, division by zero is not allowed. If you try, the interpreter will inform you that the operation you're trying to execute is invalid. It will even highlight the error in your file. Negative powers are valid operations that will evaluate to the same result as would a similar BASIC operation.
