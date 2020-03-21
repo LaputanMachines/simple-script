@@ -96,6 +96,8 @@ func-def    : KEYWORD:FUN IDENTIFIER?
             | (NEWLINE statements KEYWORD:END)
 ```
 
+This grammar was lifted from [davidcallanan/py-myopl-code](https://github.com/davidcallanan/py-myopl-code/blob/master/ep14/grammar.txt) as they already had the most accurate and feature-rich BASIC grammar I could find online. This grammar is completely barebones; all BASIC implementations would be identical. This was lifted to save me the hastle of drafting the initial grammar myself, a task only POWs and grammar enthusiasts enjoy.
+
 ## Backend Architecture
 
 The process of building and interpreting a programming language from scratch can be split into three main components. Each component produces their own deliverable that is used as an input for the following process.
