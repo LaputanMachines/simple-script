@@ -1,10 +1,7 @@
 # SimpleScript Programming Language
 
-Interpreted programming language built with Python. 
-Docs and releases are served through GitHub. 
-It's turing complete and is simple to use.
-It is based on the BASIC programming language, and features error highlighting, variables, functions, etc.
-The language is simple to use yet robust enough to support the creation of actual programs.
+SimpleScript is an interpreted, BACIC-like programming language built with Python. It is small, clean, and powerful. 
+The language itself is straightforward and allows for cleaner-looking mathematical operations and data processing.
 
 ## Installation
 
