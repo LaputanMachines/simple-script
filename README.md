@@ -1,5 +1,10 @@
 # SimpleScript: Interpreted Programming Language
 
+  * [Installation](#installation)
+  * [How To Use](#how-to-use)
+  * [Language Grammars](#language-grammars)
+  * [Backend Architecture](#backend-architecture)
+
 Interpreted programming language built with Python. 
 Docs and releases are served through GitHub. 
 It's turing complete and is simple to use.
