@@ -214,7 +214,3 @@ Here are some of the best physical and digital resources I could find on the sub
 * [Introduction to Programming Languages/Interpreted Programs](https://en.wikibooks.org/wiki/Introduction_to_Programming_Languages/Interpreted_Programs)
 
 Hopefully these help inform similar projects in the future. While SimpleScript is "complete," there is a great deal that can be improved upon. I, for one, am less-than-satisfied with much of the variable and function mechanisms of SimpleScript.
-
----
-
-&copy; 2020 Michael Bassili ([FlatlanderWoman](https://github.com/FlatlanderWoman)), Licensed Under GPL-3.0
