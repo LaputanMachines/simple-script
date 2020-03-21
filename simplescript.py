@@ -11,6 +11,10 @@ from bin.context import Context
 from bin.interpreter import Interpreter
 from bin.lexer import Lexer
 from bin.parser import Parser
+from bin.symbol_table import SymbolTable
+
+# Initialize a global SymbolTable instance
+global_symbol_table = SymbolTable()
 
 
 def run(fn, stream):
@@ -40,6 +44,7 @@ def run(fn, stream):
     # Interpret the AST
     interpreter = Interpreter()
     context = Context('<program>')
+    context.symbol_table = global_symbol_table
     result = interpreter.visit(ast.node, context)
 
     return result.value, result.error

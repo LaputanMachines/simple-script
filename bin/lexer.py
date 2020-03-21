@@ -44,6 +44,10 @@ class Lexer:
             elif self.current_character in DIGITS:
                 tokens.append(self.make_number())
 
+            # Transform input stream into an identifier Token
+            elif self.current_character in LETTERS:
+                tokens.append(self.make_identifier())
+
             # Tokenize all valid operators
             elif self.current_character == '+':
                 tokens.append(Token(TP_PLUS, start_pos=self.position))
@@ -65,6 +69,9 @@ class Lexer:
                 self.advance()
             elif self.current_character == '%':
                 tokens.append(Token(TP_MODULO, start_pos=self.position))
+                self.advance()
+            elif self.current_character == '=':
+                tokens.append(Token(TP_EQUALS, start_pos=self.position))
                 self.advance()
             elif self.current_character == '(':
                 tokens.append(Token(TP_LPAREN, start_pos=self.position))
@@ -105,3 +112,12 @@ class Lexer:
             return Token(TP_INT, int(number_str), start_pos, self.position)
         else:  # Must be FLOAT data type
             return Token(TP_FLOAT, float(number_str), start_pos, self.position)
+
+    def make_identifier(self):
+        identifier_str = ''
+        start_pos = self.position.copy()
+        while self.current_character is not None and self.current_character in LETTERS + DIGITS + '_':
+            identifier_str += self.current_character
+            self.advance()
+        token_type = TP_KEYWORD if identifier_str in KEYWORDS else TP_IDENTIFIER
+        return Token(token_type, identifier_str, start_pos, self.position)

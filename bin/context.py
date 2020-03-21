@@ -15,3 +15,4 @@ class Context:
         self.display_name = display_name
         self.parent_context = parent_context
         self.parent_entry_pos = parent_entry_pos
+        self.symbol_table = None

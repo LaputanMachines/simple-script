@@ -2,6 +2,7 @@
 """Represents the Interpreter mechanism."""
 
 from bin.constants import *
+from bin.errors import ActiveRuntimeError
 from bin.number import Number
 from bin.runtime_result import RuntimeResult
 
@@ -93,3 +94,35 @@ class Interpreter:
         if error:
             return runtime_result.failure(error)
         return runtime_result.success(number.set_position(node.start_pos, node.end_pos))
+
+    def visit_varaccessnode(self, node, context):
+        """
+        Accesses the value of variables in the stream.
+        :param node: Node with which to fetch the variable.
+        :param context: Context of the caller.
+        :return: ParseResult of fetching a variable's value and executing it.
+        """
+        runtime_result = RuntimeResult()
+        var_name = node.var_name.value
+        var_value = context.symbol_table.get(var_name)
+        if not var_value:
+            runtime_result.failure(ActiveRuntimeError('Variable name "{}" is not defined.'.format(var_name),
+                                                      node.start_pos,
+                                                      node.end_pos,
+                                                      context))
+        return runtime_result.success(var_value)
+
+    def visit_varassignnode(self, node, context):
+        """
+        Assigns the value of variables in the stream.
+        :param node: Node of a variable to assign.
+        :param context: Context of the caller.
+        :return: ParseResult of assigning the variable.
+        """
+        runtime_result = RuntimeResult()
+        var_name = node.var_name.value
+        var_value = runtime_result.register(self.visit(node.value_node, context))
+        if runtime_result.error:
+            return runtime_result
+        context.symbol_table.set(var_name, var_value)
+        return runtime_result.success(var_value)

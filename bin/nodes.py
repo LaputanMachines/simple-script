@@ -18,6 +18,34 @@ class NumberNode:
         return '{}'.format(self.token)
 
 
+class VarAccessNode:
+    """Supports accessing the variables in the grammar."""
+
+    def __init__(self, var_name):
+        """
+        Initializes a VarAccessNode instance.
+        :param var_name: Name of the VAR Token.
+        """
+        self.var_name = var_name
+        self.start_pos = self.var_name.start_pos
+        self.end_pos = self.var_name.end_pos
+
+
+class VarAssignNode:
+    """Supports assigning values to variables in the grammar."""
+
+    def __init__(self, var_name, value_node):
+        """
+        Initializes a VarAssignNode instance.
+        :param var_name: Name of the VAR object.
+        :param value_node: Node value of the object.
+        """
+        self.var_name = var_name
+        self.value_node = value_node
+        self.start_pos = self.var_name.start_pos
+        self.end_pos = self.value_node.end_pos
+
+
 class BinOpNode:
     """Represents a Node for binary operations."""
 

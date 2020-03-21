@@ -24,3 +24,12 @@ class Token:
         if self.value:
             return '{}:{}'.format(self.type, self.value)
         return '{}'.format(self.type)
+
+    def matches(self, token_type, token_value):
+        """
+        Returns True if the type and value of two Tokens matches.
+        :param token_type: Type of the Token instance.
+        :param token_value: Value of the Token instance.
+        :return: True if the type and value of two Token instances match.
+        """
+        return self.type == token_type and self.value == token_value
