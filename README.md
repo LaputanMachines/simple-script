@@ -152,7 +152,7 @@ func-def    : KEYWORD:FUN IDENTIFIER?
             | (NEWLINE statements KEYWORD:END)
 ```
 
-This grammar was lifted from [davidcallanan/py-myopl-code](https://github.com/davidcallanan/py-myopl-code/blob/master/ep14/grammar.txt) as they already had the most accurate and feature-rich BASIC grammar I could find online. This grammar is completely barebones; all BASIC implementations would be identical. This was lifted to save me the hastle of drafting the initial grammar myself, a task only POWs and grammar enthusiasts enjoy.
+This grammar was lifted from [davidcallanan/py-myopl-code](https://github.com/davidcallanan/py-myopl-code/blob/master/ep14/grammar.txt) as they already had the most accurate and feature-rich BASIC grammar I could find online. This grammar is completely barebones; all BASIC implementations would be identical. This was lifted to save me the hastle of drafting the initial grammar myself, a task reserved for POWs and grammar enthusiasts.
 
 ## Backend Architecture
 
