@@ -181,4 +181,4 @@ Hopefully these help inform similar projects in the future. While SimpleScript i
 
 ---
 
-&copy; 2020 Michael Bassili Licensed Under GPL-3.0
+&copy; 2020 Michael Bassili ([FlatlanderWoman](https://github.com/FlatlanderWoman)), Licensed Under GPL-3.0
