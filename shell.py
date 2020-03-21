@@ -10,7 +10,7 @@ print('\n' + hash_divider + '\n' + title_note + '\n'
       + copyright_note + '\n' + hash_divider + '\n')
 
 while True:
-    input_stream = input('[SimpleScript shell]$ ')
+    input_stream = input('$ ')
     if input_stream == 'exit':
         print()  # Newline to separate content
         exit(0)  # Terminate from the shell
