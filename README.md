@@ -181,4 +181,4 @@ Hopefully these help inform similar projects in the future. While SimpleScript i
 
 ---
 
-<p align="center"><img src="https://img.shields.io/badge/license-GNU-red.svg" /> <img src="https://img.shields.io/badge/maintainer-FlatlanderWoman-informational.svg" /> <img src="https://img.shields.io/badge/version-v1.0-yellow.svg" /></p>
+&copy; 2020 Michael Bassili Licensed Under GPL-3.0
