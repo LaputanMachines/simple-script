@@ -54,14 +54,20 @@ class Parser:
         """
         parse_result = ParseResult()
         token = self.current_token
+
+        # Parse integers and floating values
         if token.type in (TP_INT, TP_FLOAT):
             parse_result.register_advancement()
             self.advance()
             return parse_result.success(NumberNode(token))
+
+        # Parse all possible identifiers
         elif token.type == TP_IDENTIFIER:
             parse_result.register_advancement()
             self.advance()
             return parse_result.success(VarAccessNode(token))
+
+        # Parse all grouped expressions
         elif token.type == TP_LPAREN:
             parse_result.register_advancement()
             self.advance()
@@ -77,6 +83,17 @@ class Parser:
                     'Expected ")" in expression.',
                     self.current_token.start_pos,
                     self.current_token.end_pos))
+
+        # Parse all if-statements
+        elif token.matches(TP_KEYWORD, 'IF'):
+            if_expr = parse_result.register(self.if_expr())
+            if parse_result.error:
+                return parse_result
+            return parse_result.success(if_expr)
+
+        # Defaults to raising an error
+        # The InvalidSyntaxError will be raised if the Parser is
+        # unable to properly parse the Token stream you provide
         return parse_result.failure(InvalidSyntaxError(
             "Expected int, float, identifier, '+', '-' or '(' in the expression.",
             token.start_pos, token.end_pos,
@@ -155,6 +172,57 @@ class Parser:
                                                            self.current_token.start_pos,
                                                            self.current_token.end_pos))
         return parse_result.success(node)
+
+    def if_expr(self):
+        """
+        Implements the IF-EXPR grammar. Supports several cases
+        as well as one final else case (optional).
+        :return: IfNode containing all cases and an else case.
+        """
+        cases, else_case = [], None
+        parse_result = ParseResult()
+        if not self.current_token.matches(TP_KEYWORD, 'IF'):
+            return parse_result.failure(InvalidSyntaxError('Expected an "IF" keyword.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        condition = parse_result.register(self.expr())
+        if parse_result.error:
+            return parse_result
+        if not self.current_token.matches(TP_KEYWORD, 'THEN'):
+            return parse_result.failure(InvalidSyntaxError('Expected an "THEN" keyword.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        expr = parse_result.register(self.expr())
+        if parse_result.error:
+            return parse_result
+        cases.append((condition, expr))
+        while self.current_token.matches(TP_KEYWORD, 'ELIF'):
+            parse_result.register_advancement()
+            self.advance()
+            condition = parse_result.register(self.expr())
+            if parse_result.error:
+                return parse_result
+            if not self.current_token.matches(TP_KEYWORD, 'THEN'):
+                return parse_result.failure(InvalidSyntaxError('Expected an "THEN" keyword.',
+                                                               self.current_token.start_pos,
+                                                               self.current_token.end_pos))
+            parse_result.register_advancement()
+            self.advance()
+            expr = parse_result.register(self.expr())
+            if parse_result.error:
+                return parse_result
+            cases.append((condition, expr))
+        if self.current_token.matches(TP_KEYWORD, 'ELSE'):
+            parse_result.register_advancement()
+            self.advance()
+            else_case = parse_result.register(self.expr())
+            if parse_result.error:
+                return parse_result
+        return parse_result.success(IfNode(cases, else_case))
 
     ################################
     # ALL BINARY OPERATION PARSERS #

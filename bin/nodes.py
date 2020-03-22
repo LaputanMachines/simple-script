@@ -82,3 +82,19 @@ class UnaryOpNode:
 
     def __repr__(self):
         return '({}, {})'.format(self.op_token, self.right_node)
+
+
+class IfNode:
+    """Represents a Node for if-statements."""
+
+    def __init__(self, cases, else_case):
+        """
+        Initializes an IfNode with cases and an else case.
+        :param cases: List of all cases in the if-statement.
+        :param else_case: Optional else case in the if-statement.
+        """
+        self.cases = cases
+        self.else_case = else_case
+        self.start_pos = self.cases[0][0].start_pos
+        self.end_pos = (self.else_case if self.else_case
+                        else self.cases[len(self.cases) - 1][0]).end_pos

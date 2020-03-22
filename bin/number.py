@@ -117,6 +117,13 @@ class Number:
         self.context = context
         return self
 
+    def is_true(self):
+        """
+        Returns True if the value of the Number is not 0.
+        :return: True if the value is not 0 (i.e. not False).
+        """
+        return self.value != 0
+
     ###############################
     # ALL LOGICAL OPERATIONS      #
     # EVERY FUNCTION IS IDENTICAL #

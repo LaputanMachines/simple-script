@@ -118,7 +118,7 @@ class Interpreter:
         Accesses the value of variables in the stream.
         :param node: Node with which to fetch the variable.
         :param context: Context of the caller.
-        :return: ParseResult of fetching a variable's value and executing it.
+        :return: Value of fetching a variable's value and executing it.
         """
         runtime_result = RuntimeResult()
         var_name = node.var_name.value
@@ -135,7 +135,7 @@ class Interpreter:
         Assigns the value of variables in the stream.
         :param node: Node of a variable to assign.
         :param context: Context of the caller.
-        :return: ParseResult of assigning the variable.
+        :return: Value of the variable.
         """
         runtime_result = RuntimeResult()
         var_name = node.var_name.value
@@ -144,3 +144,27 @@ class Interpreter:
             return runtime_result
         context.symbol_table.set(var_name, var_value)
         return runtime_result.success(var_value)
+
+    def visit_ifnode(self, node, context):
+        """
+        Accesses the IfNode instance in the stream.
+        :param node: IfNode instance we wish to visit.
+        :param context: Context of the caller.
+        :return: Value of the if-statement, or None.
+        """
+        runtime_result = RuntimeResult()
+        for condition, expr in node.cases:
+            condition_value = runtime_result.register(self.visit(condition, context))
+            if runtime_result.error:
+                return runtime_result
+            if condition_value.is_true():
+                expr_value = runtime_result.register(self.visit(expr, context))
+                if runtime_result.error:
+                    return runtime_result
+                return runtime_result.success(expr_value)
+        if node.else_case:
+            else_value = runtime_result.register(self.visit(node.else_case, context))
+            if runtime_result.error:
+                return runtime_result
+            return runtime_result.success(else_value)
+        return runtime_result.success(None)
