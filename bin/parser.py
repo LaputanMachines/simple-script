@@ -204,10 +204,8 @@ class Parser:
         left_factor = parse_result.register(func_a())
         if parse_result.error:
             return parse_result
-
-        # TODO (self.current_tok.type, self.current_tok.value) in ops
-
-        while self.current_token.type in ops or self.current_token.type in ops:
+        while self.current_token.type in ops or \
+                (self.current_token.type, self.current_token.value) in ops:
             op_token = self.current_token
             parse_result.register_advancement()
             self.advance()
@@ -316,7 +314,7 @@ class Parser:
         var_name_token = self.current_token
         parse_result.register_advancement()
         self.advance()
-        if not self.current_token.type != TP_EQUALS:
+        if self.current_token.type != TP_EQUALS:
             return parse_result.failure(InvalidSyntaxError('Expected "=" character.',
                                                            self.current_token.start_pos,
                                                            self.current_token.end_pos))

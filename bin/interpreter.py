@@ -202,7 +202,6 @@ class Interpreter:
             condition = lambda: index > end_value.value
 
         while condition():
-            print('HERE')
             context.symbol_table.set(node.var_name_token.value, Number(index))
             index += step_value.value
             runtime_result.register(self.visit(node.body_node, context))
