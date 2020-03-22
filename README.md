@@ -21,11 +21,11 @@ python shell.py  # Launches the interactive SimpleScript shell
 
 The following special variables have set values in the language. However, they _can_ be remapped in your program. This is by design and allows your program to define its own basic terms and concepts.
 
-| Variable | Value | Use |
-| --- | --- | --- |
-| NULL | 0 | Represents an empty value |
-| TRUE | 1 | Represents a True Boolean | 
-| FALSE | 0 | Represents a False Boolean | 
+| Variable | SimpleScript Variable | Value | Use |
+| --- | --- | --- | --- |
+| Null/NaN | `NULL` | 0 | Represents an empty value |
+| Logical True | `TRUE` | 1 | Represents a True Boolean | 
+| Logical False | `FALSE` | 0 | Represents a False Boolean | 
 
 Note that since these values are stored in a symbol table, you can also define `true` as your own version of `TRUE`; the values of `TRUE` and `true` can be different if you want. SimpleScript will never tell you that you shouldn't reassign these special variables. Configure your program as you'd like.
 
@@ -35,13 +35,13 @@ Here is a table including all supported mathematical operations in SimpleScript.
 
 | Operation | SimpleScript Command | Description | Notes |
 |---|---|---|---|
-| Addition | + | Performs addition |  |
-| Subtraction | - | Performs subtraction |  |
-| Multiplication | * | Performs multiplication |  |
-| Division | / | Performs typical floating division | Cannot divide by 0 |
-| Integer Division | &#124; | Performs division using integers | Cannot divide by 0 |
-| Power | ^ | Raises expression to a power | Supports negative powers |
-| Modulo | % | Returns remainder of division |  |
+| Addition | `+` | Performs addition |  |
+| Subtraction | `-` | Performs subtraction |  |
+| Multiplication | `*` | Performs multiplication |  |
+| Division | `/` | Performs typical floating division | Cannot divide by 0 |
+| Integer Division | `\|` | Performs division using integers | Cannot divide by 0 |
+| Power | `^` | Raises expression to a power | Supports negative powers |
+| Modulo | `%` | Returns remainder of division |  |
 
 All these operations can be performed on both numeric values and sub-expressions, including variables. Variables are executed before any other numeric operation, so you can actually assign variables _while performing numeric operations_ on other values. 
 
@@ -140,12 +140,12 @@ The following comparison operators are supported in SimpleScript. They can be us
 
 | Operator | SimpleScript Command | Description |
 | --- | --- | --- |
-| Exactly Equals | == | Evaluates to TRUE if both sides are equal |
-| Not Equals | != | Evaluates to TRUE if both sides are not equal |
-| Less Than | < | Evaluates to TRUE if the left side is smaller than the right side |
-| Greater Than | > | Evaluates to TRUE if the left side is larger than the right side |
-| Less Than Or Equals To | <= | Evaluates to TRUE if the left side is smaller or equal to the right side |
-| Greater Than Or Equals To | >= | Evaluates to TRUE if the left side is larger or equal to the right side |
+| Exactly Equals | `==` | Evaluates to TRUE if both sides are equal |
+| Not Equals | `!=` | Evaluates to TRUE if both sides are not equal |
+| Less Than | `<` | Evaluates to TRUE if the left side is smaller than the right side |
+| Greater Than | `>` | Evaluates to TRUE if the left side is larger than the right side |
+| Less Than Or Equals To | `<=` | Evaluates to TRUE if the left side is smaller or equal to the right side |
+| Greater Than Or Equals To | `>=` | Evaluates to TRUE if the left side is larger or equal to the right side |
 
 These operators are the same as BASIC or Python's operators, so their syntax should hopefully be familiar to some. Comparisons between 1 and 0 can be interpreted as comparisons between TRUE and FALSE respectively.
 
@@ -155,9 +155,9 @@ No language would be complete without logical operators. These operate the same 
 
 | Operator | SimpleScript Command | Description | Notes |
 | --- | --- | --- | --- | 
-| Logical AND | AND | Evaluates to TRUE if both sizes are TRUE |  |
-| Logical OR | OR | Evaluates to TRUE if at least one side is TRUE |  |
-| Negation | NOT | Evaluates to the opposite Boolean value of the expression | TRUE becomes FALSE, and vice-versa |
+| Logical AND | `AND` | Evaluates to TRUE if both sizes are TRUE |  |
+| Logical OR | `OR` | Evaluates to TRUE if at least one side is TRUE |  |
+| Negation | `NOT` | Evaluates to the opposite Boolean value of the expression | TRUE becomes FALSE, and vice-versa |
 
 These can be chained into variable definitions and other assignments and function declarations to evaluate the truth values of abstract statements. The underlying ASTs of these operations are built in such a way to be able to handle applications on abstract entities; you can apply these logical operators to any expression.
 
