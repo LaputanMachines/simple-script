@@ -17,6 +17,24 @@ In your BASH terminal, run the `shell.py` script using Python.
 python shell.py  # Launches the interactive SimpleScript shell
 ```
 
+By default, error messages are not displayed. To toggle the visibility of error messages, use the `debug` command.
+This will allow all error messages to be printed after any interpretation. This is handy for improving the language itself. It's also handy to see smaller syntax and execution errors that the interpreter may have encountered.
+The reason it's not enabled by default is that one of the principles of SimpleScript is to rarely stop you dead in your tracks. Error handling measures have been built to inform-if-needed, otherwise it will attempt to sally forth.
+
+```BASIC
+$ debug
+```
+
+To exit the interactive shell, simply use the `exit` keyword. This will terminate your program and perform garbage collection.
+You'll be dumped back into the BASH terminal you launched from. 
+
+```BASIC
+$ exit
+```
+
+More specifically, garbage collection of the variables and functions you created and used will occur. All system variables and functions will return to their original state.
+This means that if you overrode the system variable `FALSE` to the value `10`, for example, that it would be restored back to its default value of `0`.
+
 ## Special Variables
 
 The following special variables have set values in the language. However, they _can_ be remapped in your program. This is by design and allows your program to define its own basic terms and concepts.
@@ -194,6 +212,62 @@ $ x
 ```
 
 These control flow operations also allow for the inline assignment of variables, as seen above. In the case that no value is assigned (e.g. `IF 0 THEN 123`), then no value is outputted.
+
+## For-Loops
+
+For-loops are control flows that execute a set number of times before terminating. For-loops are great for iteration and compounding operations.
+SimpleScript follows the BASIC model of for-loops, where a loop condition are defined and a body expression is grouped up and executed. More simply, SimpleScript for-loops are formatted like for-loops in C.
+
+```BASIC
+$ VAR x = 1
+1
+$ FOR i = 1 TO 5 THEN VAR x = x + i
+$ x
+11
+```
+
+```BASIC
+$ VAR y = 100
+100
+$ FOR i = 100 TO 0 STEP -1 THEN VAR y = y - i
+$ y
+-4950
+```
+
+```BASIC
+$ VAR z = 1  
+1
+$ IF 10 == (20 - 10) THEN FOR i = 0 TO 10 THEN VAR z = z + i
+$ z
+46
+```
+
+SimpleScript allows you to assign variables inline with your for-loop. This opens up the possibility for dynamic variable assignment depending on predefined contexts.
+The greatest benefit, however, is that because SimpleScript allows for mutations of variables, you can initialize a variable beforehand and then use it to perform meta-computations in the for-loop itself. 
+
+## While-Loops
+
+Like for-loops, while-loops take some condition and execute an expression. The difference here is that the provided expression will keep executing until the provided condition proves false. 
+This allows us to repeat programs and expressions until we reach some desired goal. 
+
+```BASIC
+$ VAR x = 1
+1
+$ WHILE x < 10 THEN VAR x = x + 1
+$ x
+10
+```
+
+```BASIC
+$ VAR y = 10
+10
+$ WHILE y > 0 AND (TRUE == 1) THEN VAR y = y - 2
+$ y
+0
+```
+
+Variables and sub-expressions can be chained together to form large compound conditions for your while-loop. The body of the loop can be similarly built. 
+These larger compound control flow programs can chain into function calls and other sub-routines, making them very powerful.
 
 ---
 
