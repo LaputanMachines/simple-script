@@ -17,6 +17,18 @@ In your BASH terminal, run the `shell.py` script using Python.
 python shell.py  # Launches the interactive SimpleScript shell
 ```
 
+## Special Variables
+
+The following special variables have set values in the language. However, they _can_ be remapped in your program. This is by design and allows your program to define its own basic terms and concepts.
+
+| Variable | Value | Use |
+| --- | --- | --- |
+| NULL | 0 | Represents an empty value |
+| TRUE | 1 | Represents a True Boolean | 
+| FALSE | 0 | Represents a False Boolean | 
+
+Note that since these values are stored in a symbol table, you can also define `true` as your own version of `TRUE`; the values of `TRUE` and `true` can be different if you want. SimpleScript will never tell you that you shouldn't reassign these special variables. Configure your program as you'd like.
+
 ## Supported Math Operators
 
 Here is a table including all supported mathematical operations in SimpleScript. Most are similar to Python or BASIC's implementations, but I've made some small changes which hopefully improve the look and feel of larger mathematical expressions.
@@ -121,6 +133,35 @@ $ y
 ```
 
 This kind of inline assignment is thanks to the interpretation of the abstract syntax tree (AST). Instead of searching line-by-line for variables to be assigned, SimpleScript simply treats the `VAR` keyword like a token that triggers the parsing of its sub-tree. In short, SimpleScript considers `VAR` definitions a higher priority than brackets in the BEDMAS order of operations.
+
+## Supported Comparison Operators
+
+The following comparison operators are supported in SimpleScript. They can be used in addition to variable assignment and function executions. This is due to how the interpreter understands the ASTs being generated. The result is that you can chain together long and complex comparisons without needing to stop to define anything.
+
+| Operator | SimpleScript Command | Description |
+| --- | --- | --- |
+| Exactly Equals | == | Evaluates to TRUE if both sides are equal |
+| Not Equals | != | Evaluates to TRUE if both sides are not equal |
+| Less Than | < | Evaluates to TRUE if the left side is smaller than the right side |
+| Greater Than | > | Evaluates to TRUE if the left side is larger than the right side |
+| Less Than Or Equals To | <= | Evaluates to TRUE if the left side is smaller or equal to the right side |
+| Greater Than Or Equals To | >= | Evaluates to TRUE if the left side is larger or equal to the right side |
+
+These operators are the same as BASIC or Python's operators, so their syntax should hopefully be familiar to some. Comparisons between 1 and 0 can be interpreted as comparisons between TRUE and FALSE respectively.
+
+## Supported Logical Operators
+
+No language would be complete without logical operators. These operate the same way as logic gates do. All of AND, OR, and NOT operate in the same way they do in regular BASIC and Python.
+
+| Operator | SimpleScript Command | Description | Notes |
+| --- | --- | --- | --- | 
+| Logical AND | AND | Evaluates to TRUE if both sizes are TRUE |  |
+| Logical OR | OR | Evaluates to TRUE if at least one side is TRUE |  |
+| Negation | NOT | Evaluates to the opposite Boolean value of the expression | TRUE becomes FALSE, and vice-versa |
+
+These can be chained into variable definitions and other assignments and function declarations to evaluate the truth values of abstract statements. The underlying ASTs of these operations are built in such a way to be able to handle applications on abstract entities; you can apply these logical operators to any expression.
+
+---
 
 ## Language Grammars
 
