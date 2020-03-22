@@ -253,5 +253,6 @@ Here are some of the best physical and digital resources I could find on the sub
 * [The "Let’s Build A Simple Interpreter" Blog Series](https://ruslanspivak.com/lsbasi-part1/)
 * [The "Make YOUR OWN Programming Language" Video Series](https://www.youtube.com/playlist?list=PLZQftyCk7_SdoVexSmwy_tBgs7P0b97yD)
 * [Introduction to Programming Languages/Interpreted Programs](https://en.wikibooks.org/wiki/Introduction_to_Programming_Languages/Interpreted_Programs)
+* [Clean Architecture: A Craftsman's Guide to Software Structure and Design (Robert C. Martin Series)](https://www.amazon.ca/dp/B075LRM681?ref_=cm_sw_r_kb_dp_zbbTDb7E1P022&tag=davidcallanan-20&linkCode=kpe)
 
 Hopefully these help inform similar projects in the future. While SimpleScript is "complete," there is a great deal that can be improved upon. I, for one, am less-than-satisfied with much of the variable and function mechanisms of SimpleScript.
