@@ -15,5 +15,5 @@ while True:
         print()  # Newline to separate content
         exit(0)  # Terminate from the shell
     result, error = simplescript.run('<stdin>', input_stream)
-    output_stream = error if error else result
-    print(output_stream)
+    if result:
+        print(result)
