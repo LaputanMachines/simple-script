@@ -39,7 +39,7 @@ Here is a table including all supported mathematical operations in SimpleScript.
 | Subtraction | `-` | Performs subtraction |  |
 | Multiplication | `*` | Performs multiplication |  |
 | Division | `/` | Performs typical floating division | Cannot divide by 0 |
-| Integer Division | `\|` | Performs division using integers | Cannot divide by 0 |
+| Integer Division | `|` | Performs division using integers | Cannot divide by 0 |
 | Power | `^` | Raises expression to a power | Supports negative powers |
 | Modulo | `%` | Returns remainder of division |  |
 
