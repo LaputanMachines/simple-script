@@ -14,7 +14,7 @@ You can use Python to launch the interactive shell. This will allow you to play 
 In your BASH terminal, run the `shell.py` script using Python. 
 
 ```BASH
-python shell.py  # Launches the interactive SimpleScript shell
+python shell.py 
 ```
 
 By default, error messages are not displayed. To toggle the visibility of error messages, use the `debug` command.
