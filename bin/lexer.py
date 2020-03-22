@@ -2,7 +2,7 @@
 """Represents a Tokenizer of Tokens."""
 
 from bin.constants import *
-from bin.errors import IllegalCharError
+from bin.errors import IllegalCharError, ExpectedCharError
 from bin.position import Position
 from bin.token import Token
 
@@ -48,7 +48,7 @@ class Lexer:
             elif self.current_character in LETTERS:
                 tokens.append(self.make_identifier())
 
-            # Tokenize all valid operators
+            # All maths and grouping operators
             elif self.current_character == '+':
                 tokens.append(Token(TP_PLUS, start_pos=self.position))
                 self.advance()
@@ -70,15 +70,25 @@ class Lexer:
             elif self.current_character == '%':
                 tokens.append(Token(TP_MODULO, start_pos=self.position))
                 self.advance()
-            elif self.current_character == '=':
-                tokens.append(Token(TP_EQUALS, start_pos=self.position))
-                self.advance()
             elif self.current_character == '(':
                 tokens.append(Token(TP_LPAREN, start_pos=self.position))
                 self.advance()
             elif self.current_character == ')':
                 tokens.append(Token(TP_RPAREN, start_pos=self.position))
                 self.advance()
+
+            # Comparison and boolean operators
+            elif self.current_character == '!':
+                token, error = self.make_not_equals()
+                if error:
+                    return [], error
+                tokens.append(token)
+            elif self.current_character == '=':
+                tokens.append(self.make_equals())
+            elif self.current_character == '<':
+                tokens.append(self.make_less_than())
+            elif self.current_character == '>':
+                tokens.append(self.make_greater_than())
 
             # Tokenize all remaining possible characters
             else:  # Report all illegal chars in stream
@@ -121,3 +131,54 @@ class Lexer:
             self.advance()
         token_type = TP_KEYWORD if identifier_str in KEYWORDS else TP_IDENTIFIER
         return Token(token_type, identifier_str, start_pos, self.position)
+
+    def make_not_equals(self):
+        """
+        Makes a not-equals Token if the '!=' chars are found.
+        :return: Token for the not-equals symbol in the lexer.
+        """
+        start_pos = self.position.copy()
+        self.advance()
+        if self.current_character == '=':
+            self.advance()
+            return Token(TP_NE, start_pos=start_pos, end_pos=self.position), None
+        self.advance()
+        return None, ExpectedCharError('Expected an "=" character after a "!" character.',
+                                       start_pos,
+                                       self.position)
+
+    def make_dual_use_token(self, initial_type, alternate_type, ):
+        """
+        Returns one of two Token types given the character string.
+        :param initial_type: Initial possible type of the Token.
+        :param alternate_type: Alternate Token type given the successive character.
+        :return: Token with either of the two possible types.
+        """
+        token_type = initial_type
+        start_pos = self.position.copy()
+        self.advance()
+        if self.current_character == '=':
+            self.advance()
+            token_type = alternate_type
+        return Token(token_type, start_pos, self.position)
+
+    def make_equals(self):
+        """
+        Creates either a single equals or a double equals Token.
+        :return: Token with either a single or a double equals type.
+        """
+        return self.make_dual_use_token(TP_EQUALS, TP_EE)
+
+    def make_less_than(self):
+        """
+        Creates either a less or a less-than Token.
+        :return: Token with either a less or a less-than type.
+        """
+        return self.make_dual_use_token(TP_LT, TP_LTE)
+
+    def make_greater_than(self):
+        """
+        Creates either a greater or a greater-than Token.
+        :return: Token with either a greater or a greater-than type.
+        """
+        return self.make_dual_use_token(TP_GT, TP_GTE)

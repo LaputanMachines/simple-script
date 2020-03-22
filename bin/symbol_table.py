@@ -16,7 +16,9 @@ class SymbolTable:
         self.parent = None
 
         # Special values in the language
-        self.symbols['null'] = Number(0)
+        self.symbols['NULL'] = Number(0)
+        self.symbols['TRUE'] = Number(1)
+        self.symbols['FALSE'] = Number(0)
 
     def get(self, variable_name):
         """

@@ -1,6 +1,7 @@
 # coding=utf-8
 """Represents Numbers in the context of SimpleScript."""
 
+from bin.constants import operations
 from bin.errors import ActiveRuntimeError
 
 
@@ -115,3 +116,51 @@ class Number:
         """
         self.context = context
         return self
+
+    ###############################
+    # ALL LOGICAL OPERATIONS      #
+    # EVERY FUNCTION IS IDENTICAL #
+    ###############################
+
+    def apply_comparison(self, other, op_str):
+        """
+        Applies the comparison operator to the other Number.
+        Call the int() function to convert our output
+        to either a 1 (TRUE) or 0 (FALSE) result.
+        :param other: Other Number to apply the operation to.
+        :param op_str: The string of the operator of the operation we desire.
+        :return: Number with the resulting operation.
+        """
+        return Number(int(operations[op_str](self.value, other.value))).set_context(self.context), None
+
+    def get_comparison_ee(self, other):
+        return self.apply_comparison(other, '==')
+
+    def get_comparison_ne(self, other):
+        return self.apply_comparison(other, '!=')
+
+    def get_comparison_lt(self, other):
+        return self.apply_comparison(other, '<')
+
+    def get_comparison_lte(self, other):
+        return self.apply_comparison(other, '<=')
+
+    def get_comparison_gt(self, other):
+        return self.apply_comparison(other, '>')
+
+    def get_comparison_gte(self, other):
+        return self.apply_comparison(other, '>=')
+
+    def anded_by(self, other):
+        return self.apply_comparison(other, 'AND')
+
+    def ored_by(self, other):
+        return self.apply_comparison(other, 'OR')
+
+    def notted(self):
+        """
+        Negates the provided boolean value, turning it
+        into a Node. Only unique comparison.
+        :return: Number node with the negated value.
+        """
+        return Number(1 if self.value == 0 else 0).set_context(self.context), None

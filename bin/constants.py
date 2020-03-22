@@ -1,14 +1,34 @@
 # coding=utf-8
 """All constants used in the backend of the SimpleScript language."""
 
+import operator
 from string import ascii_letters, digits
+
+#############
+# OPERATORS #
+#############
+
+operations = {'>': operator.gt,
+              '<': operator.lt,
+              '>=': operator.ge,
+              '<=': operator.le,
+              '==': operator.eq,
+              '!=': operator.ne,
+              'AND': operator.and_,
+              'OR': operator.or_}
 
 ####################
 # LIST OF KEYWORDS #
 ####################
 
+TP_IDENTIFIER = 'IDENTIFIER'
+TP_KEYWORD = 'KEYWORD'
+TP_EOF = 'EOF'
 KEYWORDS = [
-    'VAR'
+    'VAR',
+    'AND',
+    'OR',
+    'NOT'
 ]
 
 #################
@@ -18,13 +38,9 @@ KEYWORDS = [
 DIGITS = digits
 LETTERS = ascii_letters
 
-##############
-# ALL TOKENS #
-##############
-
-TP_IDENTIFIER = 'IDENTIFIER'
-TP_KEYWORD = 'KEYWORD'
-TP_EOF = 'EOF'
+#############
+# ALL MATHS #
+#############
 
 TP_INT = 'INT'
 TP_FLOAT = 'FLOAT'
@@ -38,3 +54,14 @@ TP_POWER = 'POWER'
 TP_EQUALS = 'EQ'
 TP_LPAREN = 'LPAREN'
 TP_RPAREN = 'RPAREN'
+
+###############
+# COMPARISONS #
+###############
+
+TP_EE = 'EE'
+TP_NE = 'NE'
+TP_LT = 'LT'
+TP_GT = 'GT'
+TP_LTE = 'LTE'
+TP_GTE = 'GTE'

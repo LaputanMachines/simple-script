@@ -75,3 +75,11 @@ class ActiveRuntimeError(Error):
             position = context.parent_entry_pos
             context = context.parent_context
         return '\nTraceback (most recent call last):\n' + result
+
+
+class ExpectedCharError(Error):
+    def __init__(self, details, start_pos, end_pos):
+        super(ExpectedCharError, self).__init__(self.__class__.__name__,
+                                                'Expected Character ({})'.format(details),
+                                                start_pos,
+                                                end_pos)

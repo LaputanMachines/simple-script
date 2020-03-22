@@ -38,14 +38,14 @@ class Parser:
     def parse(self):
         """
         Triggers the parsing of the input stream.
-        :return: ParseResult instance.
+        :return: Parser instance.
         """
-        parse_result = self.expr()
-        if not parse_result.error and self.current_token.type != TP_EOF:
-            return parse_result.failure(InvalidSyntaxError(self.current_token.start_pos,
-                                                           self.current_token.end_pos,
-                                                           'Expected "+", "-", "*", or "/" operator.'))
-        return parse_result
+        parser = self.expr()
+        if not parser.error and self.current_token.type != TP_EOF:
+            return parser.failure(InvalidSyntaxError(self.current_token.start_pos,
+                                                     self.current_token.end_pos,
+                                                     'Expected "+", "-", "*", or "/" operator.'))
+        return parser
 
     def atom(self):
         """
@@ -77,23 +77,15 @@ class Parser:
                     'Expected ")" in expression.',
                     self.current_token.start_pos,
                     self.current_token.end_pos))
-
         return parse_result.failure(InvalidSyntaxError(
-            token.pos_start, token.pos_end,
-            "Expected int, float, identifier, '+', '-' or '('"
+            "Expected int, float, identifier, '+', '-' or '(' in the expression.",
+            token.start_pos, token.end_pos,
         ))
-
-    def power(self):
-        """
-        Executes the power operation.
-        :return: BinOpNode from the resulting operation.
-        """
-        return self.binary_operation(self.atom, [TP_POWER], self.factor)
 
     def factor(self):
         """
         Implements the FACTOR grammar.
-        :return: The ParseResult of the numeral Token.
+        :return: The Node of the numeral Token.
         """
         token = self.current_token
         parse_result = ParseResult()
@@ -104,43 +96,34 @@ class Parser:
             if parse_result.error:
                 return parse_result
             return parse_result.success(UnaryOpNode(token, factor))
-
         return self.power()
 
-    def binary_operation(self, func_a, ops, func_b=None):
+    def comparison_expr(self):
         """
-        Generic binary operation handling for all
-        multi-term grammars and their factors.
-        :param func_a: Function which returns a factor.
-        :param ops: Possible operations that can be handled.
-        :param func_b: Optional second function.
-        :return: ParseResult of all possible TERM factors.
+        Implements the comparison expression grammar.
+        :return: Node with the result of the comparison operation.
         """
-        if not func_b:
-            func_b = func_a
         parse_result = ParseResult()
-        left_factor = parse_result.register(func_a())
-        if parse_result.error:
-            return parse_result
-        while self.current_token.type in ops:
+        if self.current_token.matches(TP_KEYWORD, 'NOT'):
             op_token = self.current_token
-            parse_result.register(self.advance())
-            right_factor = parse_result.register(func_b())
+            parse_result.register_advancement()
+            self.advance()
+            node = parse_result.register(self.comparison_expr())
             if parse_result.error:
                 return parse_result
-            left_factor = BinOpNode(left_factor, op_token, right_factor)
-        return parse_result.success(left_factor)
-
-    def term(self):
-        """
-        Implements the TERM grammar.
-        :return: BinOpNode of all possible FACTOR objects.
-        """
-        return self.binary_operation(self.factor, [TP_MUL,
-                                                   TP_DIV,
-                                                   TP_POWER,
-                                                   TP_CLEAN_DIV,
-                                                   TP_MODULO])
+            return parse_result.success(UnaryOpNode(op_token, node))
+        node = parse_result.register(self.binary_operation(self.arithmetic_expr, [TP_EE,
+                                                                                  TP_NE,
+                                                                                  TP_LT,
+                                                                                  TP_GT,
+                                                                                  TP_LTE,
+                                                                                  TP_GTE]))
+        if parse_result.error:
+            return parse_result.failure(InvalidSyntaxError(
+                "Expected int, float, identifier, '+', '-', '(', or 'NOT' in the expression.",
+                self.current_token.start_pos,
+                self.current_token.end_pos))
+        return parse_result.success(node)
 
     def expr(self):
         """
@@ -165,4 +148,67 @@ class Parser:
             if parse_result.error:
                 return parse_result
             return parse_result.success(VarAssignNode(var_name, expression))
+        node = parse_result.register(self.binary_operation(self.comparison_expr,
+                                                           [(TP_KEYWORD, 'AND'), (TP_KEYWORD, 'OR')]))
+        if parse_result.error:
+            return parse_result.failure(InvalidSyntaxError('Expected VAR or mathematical operator character.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        return parse_result.success(node)
+
+    ################################
+    # ALL BINARY OPERATION PARSERS #
+    ################################
+
+    def binary_operation(self, func_a, ops, func_b=None):
+        """
+        Generic binary operation handling for all
+        multi-term grammars and their factors.
+        :param func_a: Function which returns a factor.
+        :param ops: Possible operations that can be handled.
+        :param func_b: Optional second function.
+        :return: Node of all possible TERM factors.
+        """
+        if not func_b:
+            func_b = func_a
+        parse_result = ParseResult()
+        left_factor = parse_result.register(func_a())
+        if parse_result.error:
+            return parse_result
+
+        # TODO (self.current_tok.type, self.current_tok.value) in ops
+
+        while self.current_token.type in ops or self.current_token.type in ops:
+            op_token = self.current_token
+            parse_result.register_advancement()
+            self.advance()
+            right_factor = parse_result.register(func_b())
+            if parse_result.error:
+                return parse_result
+            left_factor = BinOpNode(left_factor, op_token, right_factor)
+        return parse_result.success(left_factor)
+
+    def power(self):
+        """
+        Executes the power operation.
+        :return: BinOpNode from the resulting operation.
+        """
+        return self.binary_operation(self.atom, [TP_POWER], self.factor)
+
+    def term(self):
+        """
+        Implements the TERM grammar.
+        :return: BinOpNode of all possible FACTOR objects.
+        """
+        return self.binary_operation(self.factor, [TP_MUL,
+                                                   TP_DIV,
+                                                   TP_POWER,
+                                                   TP_CLEAN_DIV,
+                                                   TP_MODULO])
+
+    def arithmetic_expr(self):
+        """
+        Implements the grammar for the arithmetic expression.
+        :return: Node of the result of the arithmetic expression.
+        """
         return self.binary_operation(self.term, [TP_PLUS, TP_MINUS])

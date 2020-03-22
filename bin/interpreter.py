@@ -71,6 +71,22 @@ class Interpreter:
             result, error = left_node.modulo_by(right_node)
         elif node.op_token.type == TP_CLEAN_DIV:
             result, error = left_node.divide_by(right_node, clean=True)
+        elif node.op_token.type == TP_NE:
+            result, error = left_node.get_comparison_ne(right_node)
+        elif node.op_token.type == TP_EE:
+            result, error = left_node.get_comparison_ee(right_node)
+        elif node.op_token.type == TP_LT:
+            result, error = left_node.get_comparison_lt(right_node)
+        elif node.op_token.type == TP_LTE:
+            result, error = left_node.get_comparison_lte(right_node)
+        elif node.op_token.type == TP_GT:
+            result, error = left_node.get_comparison_gt(right_node)
+        elif node.op_token.type == TP_GTE:
+            result, error = left_node.get_comparison_gte(right_node)
+        elif node.op_token.matches(TP_KEYWORD, 'AND'):
+            result, error = left_node.anded_by(right_node)
+        elif node.op_token.matches(TP_KEYWORD, 'OR'):
+            result, error = left_node.ored_by(right_node)
         if runtime_result.error:
             return runtime_result.failure(runtime_result)
         if error:
@@ -91,6 +107,8 @@ class Interpreter:
             return runtime_result
         if node.op_token.type == TP_MINUS:
             number, error = number.multiply_by(Number(-1))
+        elif node.op_token.matches(TP_KEYWORD, 'NOT'):
+            number, error = number.notted()
         if error:
             return runtime_result.failure(error)
         return runtime_result.success(number.set_position(node.start_pos, node.end_pos))
