@@ -91,6 +91,18 @@ class Parser:
                 return parse_result
             return parse_result.success(if_expr)
 
+        # Parse for- and while-loops
+        elif token.matches(TP_KEYWORD, 'FOR'):
+            for_expr = parse_result.register(self.for_expr())
+            if parse_result.error:
+                return parse_result
+            return parse_result.success(for_expr)
+        elif token.matches(TP_KEYWORD, 'WHILE'):
+            while_expr = parse_result.register(self.while_expr())
+            if parse_result.error:
+                return parse_result
+            return parse_result.success(while_expr)
+
         # Defaults to raising an error
         # The InvalidSyntaxError will be raised if the Parser is
         # unable to properly parse the Token stream you provide
@@ -173,57 +185,6 @@ class Parser:
                                                            self.current_token.end_pos))
         return parse_result.success(node)
 
-    def if_expr(self):
-        """
-        Implements the IF-EXPR grammar. Supports several cases
-        as well as one final else case (optional).
-        :return: IfNode containing all cases and an else case.
-        """
-        cases, else_case = [], None
-        parse_result = ParseResult()
-        if not self.current_token.matches(TP_KEYWORD, 'IF'):
-            return parse_result.failure(InvalidSyntaxError('Expected an "IF" keyword.',
-                                                           self.current_token.start_pos,
-                                                           self.current_token.end_pos))
-        parse_result.register_advancement()
-        self.advance()
-        condition = parse_result.register(self.expr())
-        if parse_result.error:
-            return parse_result
-        if not self.current_token.matches(TP_KEYWORD, 'THEN'):
-            return parse_result.failure(InvalidSyntaxError('Expected an "THEN" keyword.',
-                                                           self.current_token.start_pos,
-                                                           self.current_token.end_pos))
-        parse_result.register_advancement()
-        self.advance()
-        expr = parse_result.register(self.expr())
-        if parse_result.error:
-            return parse_result
-        cases.append((condition, expr))
-        while self.current_token.matches(TP_KEYWORD, 'ELIF'):
-            parse_result.register_advancement()
-            self.advance()
-            condition = parse_result.register(self.expr())
-            if parse_result.error:
-                return parse_result
-            if not self.current_token.matches(TP_KEYWORD, 'THEN'):
-                return parse_result.failure(InvalidSyntaxError('Expected an "THEN" keyword.',
-                                                               self.current_token.start_pos,
-                                                               self.current_token.end_pos))
-            parse_result.register_advancement()
-            self.advance()
-            expr = parse_result.register(self.expr())
-            if parse_result.error:
-                return parse_result
-            cases.append((condition, expr))
-        if self.current_token.matches(TP_KEYWORD, 'ELSE'):
-            parse_result.register_advancement()
-            self.advance()
-            else_case = parse_result.register(self.expr())
-            if parse_result.error:
-                return parse_result
-        return parse_result.success(IfNode(cases, else_case))
-
     ################################
     # ALL BINARY OPERATION PARSERS #
     ################################
@@ -280,3 +241,141 @@ class Parser:
         :return: Node of the result of the arithmetic expression.
         """
         return self.binary_operation(self.term, [TP_PLUS, TP_MINUS])
+
+    ################################
+    # ALL CONTROL FLOW EXPRESSIONS #
+    ################################
+
+    def if_expr(self):
+        """
+        Implements the IF-EXPR grammar. Supports several cases
+        as well as one final else case (optional).
+        :return: IfNode containing all cases and an else case.
+        """
+        cases, else_case = [], None
+        parse_result = ParseResult()
+        if not self.current_token.matches(TP_KEYWORD, 'IF'):
+            return parse_result.failure(InvalidSyntaxError('Expected an "IF" keyword.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        condition = parse_result.register(self.expr())
+        if parse_result.error:
+            return parse_result
+        if not self.current_token.matches(TP_KEYWORD, 'THEN'):
+            return parse_result.failure(InvalidSyntaxError('Expected an "THEN" keyword.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        expr = parse_result.register(self.expr())
+        if parse_result.error:
+            return parse_result
+        cases.append((condition, expr))
+        while self.current_token.matches(TP_KEYWORD, 'ELIF'):
+            parse_result.register_advancement()
+            self.advance()
+            condition = parse_result.register(self.expr())
+            if parse_result.error:
+                return parse_result
+            if not self.current_token.matches(TP_KEYWORD, 'THEN'):
+                return parse_result.failure(InvalidSyntaxError('Expected an "THEN" keyword.',
+                                                               self.current_token.start_pos,
+                                                               self.current_token.end_pos))
+            parse_result.register_advancement()
+            self.advance()
+            expr = parse_result.register(self.expr())
+            if parse_result.error:
+                return parse_result
+            cases.append((condition, expr))
+        if self.current_token.matches(TP_KEYWORD, 'ELSE'):
+            parse_result.register_advancement()
+            self.advance()
+            else_case = parse_result.register(self.expr())
+            if parse_result.error:
+                return parse_result
+        return parse_result.success(IfNode(cases, else_case))
+
+    def for_expr(self):
+        """
+        Parses the for-loop expression of the grammar.
+        :return: ForNode with the for-loop expression.
+        """
+        parse_result = ParseResult()
+        if not self.current_token.matches(TP_KEYWORD, 'FOR'):
+            return parse_result.failure(InvalidSyntaxError('Expected "FOR" keyword.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        if self.current_token.type != TP_IDENTIFIER:
+            return parse_result.failure(InvalidSyntaxError('Expected an identifier.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        var_name_token = self.current_token
+        parse_result.register_advancement()
+        self.advance()
+        if not self.current_token.type != TP_EQUALS:
+            return parse_result.failure(InvalidSyntaxError('Expected "=" character.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        start_value_node = parse_result.register(self.expr())
+        if parse_result.error:
+            return parse_result
+        if not self.current_token.matches(TP_KEYWORD, 'TO'):
+            return parse_result.failure(InvalidSyntaxError('Expected "TO" keyword.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        end_value_node = parse_result.register(self.expr())
+        if parse_result.error:
+            return parse_result
+        if self.current_token.matches(TP_KEYWORD, 'STEP'):
+            parse_result.register_advancement()
+            self.advance()
+            step_value = parse_result.register(self.expr())
+            if parse_result.error:
+                return parse_result
+        else:
+            step_value = None
+        if not self.current_token.matches(TP_KEYWORD, 'THEN'):
+            return parse_result.failure(InvalidSyntaxError('Expected "THEN" keyword.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        body = parse_result.register(self.expr())
+        if parse_result.error:
+            return parse_result
+        return parse_result.success(ForNode(var_name_token, start_value_node,
+                                            end_value_node, step_value, body))
+
+    def while_expr(self):
+        """
+        Parses a while-loop expression in the grammar.
+        :return: WhileNode with all conditions of the while-loop.
+        """
+        parse_result = ParseResult()
+        if not self.current_token.matches(TP_KEYWORD, 'WHILE'):
+            return parse_result.failure(InvalidSyntaxError('Expected "WHILE" keyword.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        condition = parse_result.register(self.expr())
+        if parse_result.error:
+            return parse_result
+        if not self.current_token.matches(TP_KEYWORD, 'THEN'):
+            return parse_result.failure(InvalidSyntaxError('Expected "THEN" keyword.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        body = parse_result.register(self.expr())
+        if parse_result.error:
+            return parse_result
+        return parse_result.success(WhileNode(condition, body))

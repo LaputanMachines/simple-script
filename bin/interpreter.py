@@ -168,3 +168,63 @@ class Interpreter:
                 return runtime_result
             return runtime_result.success(else_value)
         return runtime_result.success(None)
+
+    def visit_fornode(self, node, context):
+        """
+        Visits the ForNode for for-loops in the stream.
+        :param node: Node of the for-loop.
+        :param context: Context of the caller.
+        :return: None for success.
+        """
+        runtime_result = RuntimeResult()
+        start_value = runtime_result.register(self.visit(node.start_value_node, context))
+        if runtime_result.error:
+            return runtime_result
+        end_value = runtime_result.register(self.visit(node.end_value_node, context))
+        if runtime_result.error:
+            return runtime_result
+        if node.step_value_node:
+            step_value = runtime_result.register(self.visit(node.step_value_node, context))
+            if runtime_result.error:
+                return runtime_result
+        else:  # Default to one iteration
+            step_value = Number(1)
+
+        # Note: PEP 8 doesn't allow for lambda expressions to be assigned to
+        #       variables directly. They prefer a function definition. However, this
+        #       is the cleanest way to do this. Code is read more often than it's
+        #       written. This expression is easier to read and understand as an
+        #       inline lambda assignment.
+        index = start_value.value
+        if step_value.value >= 0:
+            condition = lambda: index < end_value.value
+        else:  # Step value must be negative
+            condition = lambda: index > end_value.value
+
+        while condition():
+            print('HERE')
+            context.symbol_table.set(node.var_name_token.value, Number(index))
+            index += step_value.value
+            runtime_result.register(self.visit(node.body_node, context))
+            if runtime_result.error:
+                return runtime_result
+        return runtime_result.success(None)
+
+    def visit_whilenode(self, node, context):
+        """
+        Visits the WhileNode for while-loops in the stream.
+        :param node: Node of the while-loop.
+        :param context: Context of the caller.
+        :return: None for success.
+        """
+        runtime_result = RuntimeResult()
+        while True:
+            condition = runtime_result.register(self.visit(node.condition, context))
+            if runtime_result.error:
+                return runtime_result
+            if not condition.is_true():
+                break
+            runtime_result.register(self.visit(node.body_node, context))
+            if runtime_result.error:
+                return runtime_result
+        return runtime_result.success(None)
