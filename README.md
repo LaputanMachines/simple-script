@@ -17,7 +17,7 @@ In your BASH terminal, run the `shell.py` script using Python.
 python shell.py  # Launches the interactive SimpleScript shell
 ```
 
-## All Supported Operators
+## Supported Math Operators
 
 Here is a table including all supported mathematical operations in SimpleScript. Most are similar to Python or BASIC's implementations, but I've made some small changes which hopefully improve the look and feel of larger mathematical expressions.
 
