@@ -161,6 +161,40 @@ No language would be complete without logical operators. These operate the same 
 
 These can be chained into variable definitions and other assignments and function declarations to evaluate the truth values of abstract statements. The underlying ASTs of these operations are built in such a way to be able to handle applications on abstract entities; you can apply these logical operators to any expression.
 
+## If-Statements
+
+You can make if-statements by using the `IF`, `ELSE`, and `ELIF` keywords. Pairing this with logical or comparison operators can allow for dynamic variable assignment.
+
+```BASIC
+$ IF TRUE THEN 123
+123
+```
+
+```BASIC
+$ IF (1 + 2) <= (3 + 4) THEN TRUE
+1
+```
+
+```BASIC
+$ IF 1 != 1 THEN 100 
+$ IF 1 != 1 THEN 100 ELSE 999
+999
+```
+
+```BASIC
+$ IF TRUE == 0 THEN (VAR x = 9) ELIF TRUE == 1 THEN (VAR x = 5) ELSE (VAR x = 0)
+5
+```
+
+```BASIC
+$ IF (10 - 5) == 5 THEN (VAR x = TRUE) ELSE (VAR x = FALSE)
+1
+$ x
+1
+```
+
+These control flow operations also allow for the inline assignment of variables, as seen above. In the case that no value is assigned (e.g. `IF 0 THEN 123`), then no value is outputted.
+
 ---
 
 ## Language Grammars
