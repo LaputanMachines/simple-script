@@ -14,7 +14,7 @@ You can use Python to launch the interactive shell. This will allow you to play 
 In your BASH terminal, run the `shell.py` script using Python. 
 
 ```BASH
-python shell.py 
+$ python shell.py 
 ```
 
 By default, error messages are not displayed. To toggle the visibility of error messages, use the `debug` command.
@@ -268,6 +268,66 @@ $ y
 
 Variables and sub-expressions can be chained together to form large compound conditions for your while-loop. The body of the loop can be similarly built. 
 These larger compound control flow programs can chain into function calls and other sub-routines, making them very powerful.
+
+## Functions
+
+You can use the `FUNC` keyword to create functions in SimpleScript. Like Python, you can assign functions to variables for future use. Function names can be made up of letters and underscores. 
+
+```BASIC
+$ FUNC my_math (a, b, c) -> a + b - c
+<function my_math>
+$ my_math (1, 2, 3)    
+0
+```
+
+```BASIC
+$ VAR my_func = FUNC my_math (a, b, c) -> a + b - c
+<function my_math>
+$ my_func
+<function my_math>
+$ my_func (1, 2, 3)  
+0
+$ my_math (1, 2, 3)    
+0
+```
+
+```BASIC
+$ debug
+$ FUNC bad_func (a, b) -> a | b ^ 2
+<function bad_func>
+$ bad_func ()
+
+Traceback (most recent call last):
+File <stdin>, line 1, in <program>
+bad_func ()
+^^^^^^^^
+```
+
+```BASIC
+$ debug
+$ FUNC bad_func (a, b) -> a | b
+<function bad_func>
+$ bad_func (1, 2, 3, 4)
+
+Traceback (most recent call last):
+File <stdin>, line 1, in <program>
+bad_func (1, 2, 3, 4)
+^^^^^^^^^^^^^^^^^^^^
+```
+
+If `debug` is enabled, the interpreter will complain if you add too many or too few function parameters. You can also create anonymous functions (e.g. lambda functions in Python) using similar syntax.
+
+```BASIC
+$ FUNC (a, b) -> a ^ 2 + b ^ 2
+<function <anonymous>>
+$ VAR anon_func = FUNC (a, b) -> a ^ 2 + b ^ 2
+<function <anonymous>>
+$ anon_func (2, 3)  
+13
+```
+
+Like variables and flow control loops, you can chain together large compound function calls inside smaller anonymous function declarations. 
+The interpreter's backend has been built to handle abstract layers of expressions and nesting; there is no restriction to the number of nested compound functions you can use.
 
 ---
 
