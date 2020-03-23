@@ -26,5 +26,6 @@ def string_with_arrows(text, start_pos, end_pos):
         result += ' ' * col_start + '^' * (col_end - col_start)
         idx_start = idx_end
         idx_end = text.find('\n', idx_start + 1)
-        if idx_end < 0: idx_end = len(text)
+        if idx_end < 0:
+            idx_end = len(text)
     return result.replace('\t', '')

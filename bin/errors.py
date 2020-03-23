@@ -54,7 +54,7 @@ class ActiveRuntimeError(Error):
 
     def __repr__(self):
         error_msg = self.generate_traceback()
-        error_msg += 'File {}, on line {}\n'.format(self.start_pos.fn, self.start_pos.ln + 1)
+        error_msg += '{}\n'.format(self.error_details)
         error_msg += string_with_arrows(self.start_pos.ftxt, self.start_pos, self.end_pos) + '\n'
         return error_msg
 

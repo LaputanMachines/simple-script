@@ -42,7 +42,7 @@ class Value:
         """
         if not other:
             other = self
-        return ActiveRuntimeError('Illegal operation performed.',
+        return ActiveRuntimeError('Illegal operation performed',
                                   self.start_pos,
                                   other.end_pos,
                                   self.context)

@@ -90,7 +90,7 @@ class Number(Value):
         """
         if isinstance(other, Number):
             if other.value == 0:
-                return None, ActiveRuntimeError('Division by 0 is not allowed.',
+                return None, ActiveRuntimeError('Division by 0 not allowed',
                                                 other.start_pos,
                                                 other.end_pos,
                                                 self.context)
@@ -107,7 +107,7 @@ class Number(Value):
         """
         if isinstance(other, Number):
             if other.value == 0:
-                return None, ActiveRuntimeError('Division by 0 is not allowed.',
+                return None, ActiveRuntimeError('Division by 0 not allowed',
                                                 other.start_pos,
                                                 other.end_pos,
                                                 self.context)

@@ -44,7 +44,7 @@ class Parser:
         if not parser.error and self.current_token.type != TP_EOF:
             return parser.failure(InvalidSyntaxError(self.current_token.start_pos,
                                                      self.current_token.end_pos,
-                                                     'Expected "+", "-", "*", or "/" operator.'))
+                                                     'Expected "+", "-", "*", or "/"'))
         return parser
 
     def call(self):
@@ -68,7 +68,7 @@ class Parser:
                 arg_nodes.append(parse_result.register(self.expr()))
                 if parse_result.error:
                     return parse_result.failure(InvalidSyntaxError(
-                        'Expected a ")", "VAR", "IF", "FOR", "WHILE", "FUNC", int, float, or identifier character.',
+                        'Expected ")", "VAR", "IF", "FOR", "WHILE", "FUNC", int, float, or identifier',
                         self.current_token.start_pos, self.current_token.end_pos))
                 while self.current_token.type == TP_COMMA:
                     parse_result.register_advancement()
@@ -77,7 +77,7 @@ class Parser:
                     if parse_result.error:
                         return parse_result
                 if self.current_token.type != TP_RPAREN:
-                    return parse_result.failure(InvalidSyntaxError('Expected a "," or ")" character.',
+                    return parse_result.failure(InvalidSyntaxError('Expected "," or ")"',
                                                                    self.current_token.start_pos,
                                                                    self.current_token.end_pos))
                 parse_result.register_advancement()
@@ -118,7 +118,7 @@ class Parser:
                 return parse_result.success(expression)
             else:
                 return parse_result.failure(InvalidSyntaxError(
-                    'Expected ")" in expression.',
+                    'Expected ")"',
                     self.current_token.start_pos,
                     self.current_token.end_pos))
 
@@ -152,7 +152,7 @@ class Parser:
         # The InvalidSyntaxError will be raised if the Parser is
         # unable to properly parse the Token stream you provide
         return parse_result.failure(InvalidSyntaxError(
-            "Expected int, float, identifier, 'IF', 'FOR', 'WHILE', 'FUNC', '+', '-' or '(' in the expression.",
+            "Expected int, float, identifier, 'IF', 'FOR', 'WHILE', 'FUNC', '+', '-' or '('",
             token.start_pos, token.end_pos,
         ))
 
@@ -194,7 +194,7 @@ class Parser:
                                                                                   TP_GTE]))
         if parse_result.error:
             return parse_result.failure(InvalidSyntaxError(
-                "Expected int, float, identifier, '+', '-', '(', or 'NOT' in the expression.",
+                "Expected int, float, identifier, '+', '-', '(', or 'NOT'",
                 self.current_token.start_pos,
                 self.current_token.end_pos))
         return parse_result.success(node)
@@ -208,13 +208,13 @@ class Parser:
         if self.current_token.matches(TP_KEYWORD, 'VAR'):
             parse_result.register(self.advance())
             if self.current_token.type != TP_IDENTIFIER:
-                return parse_result.failure(InvalidSyntaxError('Expected identifier in the expression.',
+                return parse_result.failure(InvalidSyntaxError('Expected identifier',
                                                                self.current_token.start_pos,
                                                                self.current_token.end_pos))
             var_name = self.current_token
             parse_result.register(self.advance())
             if self.current_token.type != TP_EQUALS:
-                return parse_result.failure(InvalidSyntaxError('Expected "=" character in the expression.',
+                return parse_result.failure(InvalidSyntaxError('Expected "="',
                                                                self.current_token.start_pos,
                                                                self.current_token.end_pos))
             parse_result.register(self.advance())
@@ -225,7 +225,7 @@ class Parser:
         node = parse_result.register(self.binary_operation(self.comparison_expr,
                                                            [(TP_KEYWORD, 'AND'), (TP_KEYWORD, 'OR')]))
         if parse_result.error:
-            return parse_result.failure(InvalidSyntaxError('Expected VAR or mathematical operator character.',
+            return parse_result.failure(InvalidSyntaxError('Expected VAR or mathematical operator',
                                                            self.current_token.start_pos,
                                                            self.current_token.end_pos))
         return parse_result.success(node)
@@ -237,7 +237,7 @@ class Parser:
         """
         parse_result = ParseResult()
         if not self.current_token.matches(TP_KEYWORD, 'FUNC'):
-            return parse_result.failure(InvalidSyntaxError('Expected "FUNC" keyword.',
+            return parse_result.failure(InvalidSyntaxError('Expected "FUNC"',
                                                            self.current_token.start_pos,
                                                            self.current_token.end_pos))
         parse_result.register_advancement()
@@ -248,12 +248,12 @@ class Parser:
             parse_result.register_advancement()
             self.advance()
             if self.current_token.type != TP_LPAREN:
-                return parse_result.failure(InvalidSyntaxError('Expected "(" character.',
+                return parse_result.failure(InvalidSyntaxError('Expected "("',
                                                                self.current_token.start_pos,
                                                                self.current_token.end_pos))
         else:  # Assume no variable name is being used
             if self.current_token.type != TP_LPAREN:
-                return parse_result.failure(InvalidSyntaxError('Expected an identifier or "(" character.',
+                return parse_result.failure(InvalidSyntaxError('Expected an identifier or "("',
                                                                self.current_token.start_pos,
                                                                self.current_token.end_pos))
         parse_result.register_advancement()
@@ -274,18 +274,18 @@ class Parser:
                 parse_result.register_advancement()
                 self.advance()
             if self.current_token.type != TP_RPAREN:
-                return parse_result.failure(InvalidSyntaxError('Expected a "," or ")" character.',
+                return parse_result.failure(InvalidSyntaxError('Expected "," or ")"',
                                                                self.current_token.start_pos,
                                                                self.current_token.end_pos))
         else:  # No identifier present on declaration
             if self.current_token.type != TP_RPAREN:
-                return parse_result.failure(InvalidSyntaxError('Expected an identifier or ")" character.',
+                return parse_result.failure(InvalidSyntaxError('Expected identifier or ")"',
                                                                self.current_token.start_pos,
                                                                self.current_token.end_pos))
         parse_result.register_advancement()
         self.advance()
         if self.current_token.type != TP_ARROW:
-            return parse_result.failure(InvalidSyntaxError('Expected a "->" character.',
+            return parse_result.failure(InvalidSyntaxError('Expected "->"',
                                                            self.current_token.start_pos,
                                                            self.current_token.end_pos))
         parse_result.register_advancement()
@@ -363,7 +363,7 @@ class Parser:
         cases, else_case = [], None
         parse_result = ParseResult()
         if not self.current_token.matches(TP_KEYWORD, 'IF'):
-            return parse_result.failure(InvalidSyntaxError('Expected an "IF" keyword.',
+            return parse_result.failure(InvalidSyntaxError('Expected "IF"',
                                                            self.current_token.start_pos,
                                                            self.current_token.end_pos))
         parse_result.register_advancement()
@@ -372,7 +372,7 @@ class Parser:
         if parse_result.error:
             return parse_result
         if not self.current_token.matches(TP_KEYWORD, 'THEN'):
-            return parse_result.failure(InvalidSyntaxError('Expected an "THEN" keyword.',
+            return parse_result.failure(InvalidSyntaxError('Expected "THEN"',
                                                            self.current_token.start_pos,
                                                            self.current_token.end_pos))
         parse_result.register_advancement()
@@ -388,7 +388,7 @@ class Parser:
             if parse_result.error:
                 return parse_result
             if not self.current_token.matches(TP_KEYWORD, 'THEN'):
-                return parse_result.failure(InvalidSyntaxError('Expected an "THEN" keyword.',
+                return parse_result.failure(InvalidSyntaxError('Expected "THEN"',
                                                                self.current_token.start_pos,
                                                                self.current_token.end_pos))
             parse_result.register_advancement()
@@ -412,7 +412,7 @@ class Parser:
         """
         parse_result = ParseResult()
         if not self.current_token.matches(TP_KEYWORD, 'FOR'):
-            return parse_result.failure(InvalidSyntaxError('Expected "FOR" keyword.',
+            return parse_result.failure(InvalidSyntaxError('Expected "FOR"',
                                                            self.current_token.start_pos,
                                                            self.current_token.end_pos))
         parse_result.register_advancement()
@@ -425,7 +425,7 @@ class Parser:
         parse_result.register_advancement()
         self.advance()
         if self.current_token.type != TP_EQUALS:
-            return parse_result.failure(InvalidSyntaxError('Expected "=" character.',
+            return parse_result.failure(InvalidSyntaxError('Expected "="',
                                                            self.current_token.start_pos,
                                                            self.current_token.end_pos))
         parse_result.register_advancement()
@@ -434,7 +434,7 @@ class Parser:
         if parse_result.error:
             return parse_result
         if not self.current_token.matches(TP_KEYWORD, 'TO'):
-            return parse_result.failure(InvalidSyntaxError('Expected "TO" keyword.',
+            return parse_result.failure(InvalidSyntaxError('Expected "TO"',
                                                            self.current_token.start_pos,
                                                            self.current_token.end_pos))
         parse_result.register_advancement()
@@ -451,7 +451,7 @@ class Parser:
         else:
             step_value = None
         if not self.current_token.matches(TP_KEYWORD, 'THEN'):
-            return parse_result.failure(InvalidSyntaxError('Expected "THEN" keyword.',
+            return parse_result.failure(InvalidSyntaxError('Expected "THEN"',
                                                            self.current_token.start_pos,
                                                            self.current_token.end_pos))
         parse_result.register_advancement()
@@ -469,7 +469,7 @@ class Parser:
         """
         parse_result = ParseResult()
         if not self.current_token.matches(TP_KEYWORD, 'WHILE'):
-            return parse_result.failure(InvalidSyntaxError('Expected "WHILE" keyword.',
+            return parse_result.failure(InvalidSyntaxError('Expected "WHILE"',
                                                            self.current_token.start_pos,
                                                            self.current_token.end_pos))
         parse_result.register_advancement()
@@ -478,7 +478,7 @@ class Parser:
         if parse_result.error:
             return parse_result
         if not self.current_token.matches(TP_KEYWORD, 'THEN'):
-            return parse_result.failure(InvalidSyntaxError('Expected "THEN" keyword.',
+            return parse_result.failure(InvalidSyntaxError('Expected "THEN"',
                                                            self.current_token.start_pos,
                                                            self.current_token.end_pos))
         parse_result.register_advancement()

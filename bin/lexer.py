@@ -162,7 +162,7 @@ class Lexer:
             self.advance()
             return Token(TP_NE, start_pos=start_pos, end_pos=self.position), None
         self.advance()
-        return None, ExpectedCharError('Expected an "=" character after a "!" character.',
+        return None, ExpectedCharError('Expected "=" after "!"',
                                        start_pos,
                                        self.position)
 

@@ -127,7 +127,7 @@ class Interpreter:
         var_name = node.var_name.value
         var_value = context.symbol_table.get(var_name)
         if not var_value:
-            runtime_result.failure(ActiveRuntimeError('Variable name "{}" is not defined.'.format(var_name),
+            runtime_result.failure(ActiveRuntimeError('VAR "{}" not defined'.format(var_name),
                                                       node.start_pos,
                                                       node.end_pos,
                                                       context))
@@ -307,13 +307,13 @@ class Function(Value):
         new_context.symbol_table = SymbolTable(new_context.parent_context.symbol_table)
         if len(args) > len(self.arg_names):
             return runtime_result.failure(ActiveRuntimeError(
-                '{} too many arguments passed into the function.'.format(len(args) - len(self.arg_names)),
+                'Too many arguments'.format(len(args) - len(self.arg_names)),
                 self.start_pos,
                 self.end_pos,
                 self.context))
         if len(args) < len(self.arg_names):
             return runtime_result.failure(ActiveRuntimeError(
-                '{} too few arguments passed into the function.'.format(len(self.arg_names) - len(args)),
+                'Too few arguments'.format(len(self.arg_names) - len(args)),
                 self.start_pos,
                 self.end_pos,
                 self.context))
