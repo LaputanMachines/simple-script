@@ -53,8 +53,7 @@ class Lexer:
                 tokens.append(Token(TP_PLUS, start_pos=self.position))
                 self.advance()
             elif self.current_character == '-':
-                tokens.append(Token(TP_MINUS, start_pos=self.position))
-                self.advance()
+                tokens.append(self.make_minus_or_arrow())
             elif self.current_character == '*':
                 tokens.append(Token(TP_MUL, start_pos=self.position))
                 self.advance()
@@ -90,6 +89,13 @@ class Lexer:
             elif self.current_character == '>':
                 tokens.append(self.make_greater_than())
 
+            # Function declarations
+            # Note: Arrows are used in function declarations
+            #       but they piggyback off of subtraction
+            elif self.current_character == ',':
+                tokens.append(Token(TP_COMMA, start_pos=self.position))
+                self.advance()
+
             # Tokenize all remaining possible characters
             else:  # Report all illegal chars in stream
                 start_pos = self.position.copy()
@@ -122,6 +128,19 @@ class Lexer:
             return Token(TP_INT, int(number_str), start_pos, self.position)
         else:  # Must be FLOAT data type
             return Token(TP_FLOAT, float(number_str), start_pos, self.position)
+
+    def make_minus_or_arrow(self):
+        """
+        Returns either an arrow or a minus Token.
+        :return: Token with either the arrow or subtraction type.
+        """
+        token_type = TP_MINUS
+        start_pos = self.position.copy()
+        self.advance()
+        if self.current_character == '>':
+            self.advance()
+            token_type = TP_ARROW
+        return Token(token_type, start_pos=start_pos, end_pos=self.position)
 
     def make_identifier(self):
         identifier_str = ''

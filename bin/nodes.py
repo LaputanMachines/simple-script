@@ -134,3 +134,45 @@ class WhileNode:
         self.body_node = body_node
         self.start_pos = self.condition.start_pos
         self.end_pos = self.body_node.end_pos
+
+
+class FuncDefNode:
+    """Represents a function definition."""
+
+    def __init__(self, var_name_token, arg_name_tokens, body_node):
+        """
+        Initializes a FuncDefNode for functions in stream.
+        :param var_name_token: Name of the function to create.
+        :param arg_name_tokens: Argument Tokens for the function.
+        :param body_node: Expression assigned to new function.
+        """
+        self.var_name_token = var_name_token
+        self.arg_name_tokens = arg_name_tokens
+        self.body_node = body_node
+        self.start_pos = None
+        if self.var_name_token:
+            self.start_pos = self.var_name_token.start_pos
+        elif len(self.arg_name_tokens) > 0:
+            self.start_pos = self.arg_name_tokens[0].start_pos
+        else:  # Assume no arguments or variable names
+            self.start_pos = self.body_node.start_pos
+        self.end_pos = self.body_node.end_pos
+
+
+class CallNode:
+    """Represents a call to a function"""
+
+    def __init__(self, node_to_call, arg_nodes):
+        """
+        Initializes a CallNode for calling functions.
+        :param node_to_call: Node of the function to call.
+        :param arg_nodes: Arguments for the function.
+        """
+        self.node_to_call = node_to_call
+        self.arg_nodes = arg_nodes
+        self.start_pos = self.node_to_call.start_pos
+        self.end_pos = None
+        if len(self.arg_nodes) > 0:
+            self.end_pos = self.arg_nodes[len(self.arg_nodes) - 1].end_pos
+        else:  # Assume function has no arguments to call
+            self.end_pos = self.node_to_call.end_pos

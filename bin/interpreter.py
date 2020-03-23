@@ -2,9 +2,12 @@
 """Represents the Interpreter mechanism."""
 
 from bin.constants import *
+from bin.context import Context
 from bin.errors import ActiveRuntimeError
 from bin.number import Number
 from bin.runtime_result import RuntimeResult
+from bin.symbol_table import SymbolTable
+from bin.value import Value
 
 
 class Interpreter:
@@ -227,3 +230,109 @@ class Interpreter:
             if runtime_result.error:
                 return runtime_result
         return runtime_result.success(None)
+
+    def visit_funcdefnode(self, node, context):
+        """
+        Visits a FuncDefNode instance.
+        :param node: The FuncDefNode instance.
+        :param context: The caller's context.
+        :return: Function Node instance.
+        """
+        runtime_result = RuntimeResult()
+        func_name = node.var_name_token.value if node.var_name_token else None
+        body_node = node.body_node
+        arg_names = [arg_name.value for arg_name in node.arg_name_tokens]
+        func_node = Function(func_name, body_node, arg_names). \
+            set_context(context).set_pos(node.start_pos, node.end_pos)
+        if node.var_name_token:
+            context.symbol_table.set(func_name, func_node)
+        return runtime_result.success(func_node)
+
+    def visit_callnode(self, node, context):
+        """
+        Visits the CallNode instance.
+        :param node: The CallNode instance.
+        :param context: The caller's context.
+        :return: The resulting Node from the exec call.
+        """
+        args = []
+        runtime_result = RuntimeResult()
+        value_to_call = runtime_result.register(self.visit(node.node_to_call, context))
+        if runtime_result.error:
+            return runtime_result
+        value_to_call = value_to_call.copy().set_pos(node.start_pos, node.end_pos)
+        for arg_node in node.arg_nodes:
+            args.append(runtime_result.register(self.visit(arg_node, context)))
+            if runtime_result.error:
+                return runtime_result
+        return_value = runtime_result.register(value_to_call.execute(args))
+        if runtime_result.error:
+            return runtime_result
+        return runtime_result.success(return_value)
+
+
+##########################################################
+# FUNCTION CLASS DEFINITION                              #
+# PLACED HERE BECAUSE EXEC() FUNC USES INTERPRETER       #
+# IMPLEMENTING THIS ELSEWHERE RESULTS IN CIRCULAR IMPORT #
+##########################################################
+
+class Function(Value):
+    """Represents a Function instance."""
+
+    def __init__(self, name, body_node, arg_names):
+        """
+        Initializes a Function instance.
+        :param name: Name of the function.
+        :param body_node: Body Node instance of the function.
+        :param arg_names: Argument names for the function.
+        """
+        super().__init__()
+        self.name = name or '<anonymous>'
+        self.body_node = body_node
+        self.arg_names = arg_names
+
+    def __repr__(self):
+        return '<function {}>'.format(self.name)
+
+    def execute(self, args):
+        """
+        Execute a Function instance.
+        :param args: Arguments being passed into the Function.
+        :return: Value of the executed Function.
+        """
+        runtime_result = RuntimeResult()
+        interpreter = Interpreter()
+        new_context = Context(self.name, self.context, self.start_pos)
+        new_context.symbol_table = SymbolTable(new_context.parent_context.symbol_table)
+        if len(args) > len(self.arg_names):
+            return runtime_result.failure(ActiveRuntimeError(
+                '{} too many arguments passed into the function.'.format(len(args) - len(self.arg_names)),
+                self.start_pos,
+                self.end_pos,
+                self.context))
+        if len(args) < len(self.arg_names):
+            return runtime_result.failure(ActiveRuntimeError(
+                '{} too few arguments passed into the function.'.format(len(self.arg_names) - len(args)),
+                self.start_pos,
+                self.end_pos,
+                self.context))
+        for index in range(len(args)):
+            arg_name = self.arg_names[index]
+            arg_value = args[index]
+            arg_value.set_context(new_context)
+            new_context.symbol_table.set(arg_name, arg_value)
+        value = runtime_result.register(interpreter.visit(self.body_node, new_context))
+        if runtime_result.error:
+            return runtime_result
+        return runtime_result.success(value)
+
+    def copy(self):
+        """
+        Copies a Function instance.
+        :return: A new Function instance.
+        """
+        function_copy = Function(self.name, self.body_node, self.arg_names)
+        function_copy.set_context(self.context)
+        function_copy.set_pos(self.start_pos, self.end_pos)
+        return function_copy

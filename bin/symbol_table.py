@@ -7,13 +7,14 @@ from bin.number import Number
 class SymbolTable:
     """Keep track of all new variable names and their values."""
 
-    def __init__(self):
+    def __init__(self, parent=None):
         """
         Initialize an empty dictionary for the symbol table
         as well as a copy of the parent's symbol table.
+        :param parent: Parent SymbolTable instance.
         """
         self.symbols = dict()
-        self.parent = None
+        self.parent = parent
 
         # Special values in the language
         self.symbols['NULL'] = Number(0)

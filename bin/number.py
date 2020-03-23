@@ -1,11 +1,12 @@
 # coding=utf-8
-"""Represents Numbers in the context of SimpleScript."""
+"""Represents Values in the context of SimpleScript."""
 
 from bin.constants import operations
 from bin.errors import ActiveRuntimeError
+from bin.value import Value
 
 
-class Number:
+class Number(Value):
     """Represents a Number instance in the interpreter."""
 
     def __init__(self, value):
@@ -16,12 +17,8 @@ class Number:
         class-level variables.
         :param value: Value of the new Number instance.
         """
+        super().__init__()
         self.value = value
-        self.start_pos = None
-        self.end_pos = None
-        self.set_position()
-        self.context = None
-        self.set_context()
 
     def __repr__(self):
         return str(self.value)
@@ -46,6 +43,8 @@ class Number:
         """
         if isinstance(other, Number):
             return Number(self.value + other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(other)
 
     def subtract_by(self, other):
         """
@@ -56,6 +55,8 @@ class Number:
         """
         if isinstance(other, Number):
             return Number(self.value - other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(other)
 
     def multiply_by(self, other):
         """
@@ -66,6 +67,8 @@ class Number:
         """
         if isinstance(other, Number):
             return Number(self.value * other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(other)
 
     def power_by(self, other):
         """
@@ -76,6 +79,8 @@ class Number:
         """
         if isinstance(other, Number):
             return Number(self.value ** other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(other)
 
     def modulo_by(self, other):
         """
@@ -90,6 +95,8 @@ class Number:
                                                 other.end_pos,
                                                 self.context)
             return Number(self.value % other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(other)
 
     def divide_by(self, other, clean=False):
         """
@@ -108,6 +115,8 @@ class Number:
                 return Number(self.value // other.value).set_context(self.context), None
             else:  # Perform regular floating point division
                 return Number(self.value / other.value).set_context(self.context), None
+        else:
+            return None, Value.illegal_operation(other)
 
     def set_context(self, context=None):
         """

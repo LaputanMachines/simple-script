@@ -47,6 +47,44 @@ class Parser:
                                                      'Expected "+", "-", "*", or "/" operator.'))
         return parser
 
+    def call(self):
+        """
+        Returns a CallNode for calling functions. Also returns
+        the pure atom if there are no arguments in parenthesis.
+        :return: CallNode for calling functions or the pure atom..
+        """
+        parse_result = ParseResult()
+        atom = parse_result.register(self.atom())
+        if parse_result.error:
+            return parse_result
+        if self.current_token.type == TP_LPAREN:
+            parse_result.register_advancement()
+            self.advance()
+            arg_nodes = []
+            if self.current_token.type == TP_RPAREN:
+                parse_result.register_advancement()
+                self.advance()
+            else:  # At least one argument being passed
+                arg_nodes.append(parse_result.register(self.expr()))
+                if parse_result.error:
+                    return parse_result.failure(InvalidSyntaxError(
+                        'Expected a ")", "VAR", "IF", "FOR", "WHILE", "FUNC", int, float, or identifier character.',
+                        self.current_token.start_pos, self.current_token.end_pos))
+                while self.current_token.type == TP_COMMA:
+                    parse_result.register_advancement()
+                    self.advance()
+                    arg_nodes.append(parse_result.register(self.expr()))
+                    if parse_result.error:
+                        return parse_result
+                if self.current_token.type != TP_RPAREN:
+                    return parse_result.failure(InvalidSyntaxError('Expected a "," or ")" character.',
+                                                                   self.current_token.start_pos,
+                                                                   self.current_token.end_pos))
+                parse_result.register_advancement()
+                self.advance()
+            return parse_result.success(CallNode(atom, arg_nodes))
+        return parse_result.success(atom)
+
     def atom(self):
         """
         Parses individual atoms in the stream.
@@ -103,11 +141,18 @@ class Parser:
                 return parse_result
             return parse_result.success(while_expr)
 
+        # Parse all function definitions
+        elif token.matches(TP_KEYWORD, 'FUNC'):
+            func_def = parse_result.register(self.func_def())
+            if parse_result.error:
+                return parse_result
+            return parse_result.success(func_def)
+
         # Defaults to raising an error
         # The InvalidSyntaxError will be raised if the Parser is
         # unable to properly parse the Token stream you provide
         return parse_result.failure(InvalidSyntaxError(
-            "Expected int, float, identifier, '+', '-' or '(' in the expression.",
+            "Expected int, float, identifier, 'IF', 'FOR', 'WHILE', 'FUNC', '+', '-' or '(' in the expression.",
             token.start_pos, token.end_pos,
         ))
 
@@ -185,6 +230,71 @@ class Parser:
                                                            self.current_token.end_pos))
         return parse_result.success(node)
 
+    def func_def(self):
+        """
+        Parses Tokens of a function definition.
+        :return: FuncDefNode with the function definition.
+        """
+        parse_result = ParseResult()
+        if not self.current_token.matches(TP_KEYWORD, 'FUNC'):
+            return parse_result.failure(InvalidSyntaxError('Expected "FUNC" keyword.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        var_name_token = None
+        if self.current_token.type == TP_IDENTIFIER:
+            var_name_token = self.current_token
+            parse_result.register_advancement()
+            self.advance()
+            if self.current_token.type != TP_LPAREN:
+                return parse_result.failure(InvalidSyntaxError('Expected "(" character.',
+                                                               self.current_token.start_pos,
+                                                               self.current_token.end_pos))
+        else:  # Assume no variable name is being used
+            if self.current_token.type != TP_LPAREN:
+                return parse_result.failure(InvalidSyntaxError('Expected an identifier or "(" character.',
+                                                               self.current_token.start_pos,
+                                                               self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        arg_name_tokens = []
+        if self.current_token.type == TP_IDENTIFIER:
+            arg_name_tokens.append(self.current_token)
+            parse_result.register_advancement()
+            self.advance()
+            while self.current_token.type == TP_COMMA:
+                parse_result.register_advancement()
+                self.advance()
+                if self.current_token.type != TP_IDENTIFIER:
+                    return parse_result.failure(InvalidSyntaxError('Expected an identifier.',
+                                                                   self.current_token.start_pos,
+                                                                   self.current_token.end_pos))
+                arg_name_tokens.append(self.current_token)
+                parse_result.register_advancement()
+                self.advance()
+            if self.current_token.type != TP_RPAREN:
+                return parse_result.failure(InvalidSyntaxError('Expected a "," or ")" character.',
+                                                               self.current_token.start_pos,
+                                                               self.current_token.end_pos))
+        else:  # No identifier present on declaration
+            if self.current_token.type != TP_RPAREN:
+                return parse_result.failure(InvalidSyntaxError('Expected an identifier or ")" character.',
+                                                               self.current_token.start_pos,
+                                                               self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        if self.current_token.type != TP_ARROW:
+            return parse_result.failure(InvalidSyntaxError('Expected a "->" character.',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        node_to_return = parse_result.register(self.expr())
+        if parse_result.error:
+            return parse_result
+        return parse_result.success(FuncDefNode(var_name_token, arg_name_tokens, node_to_return))
+
     ################################
     # ALL BINARY OPERATION PARSERS #
     ################################
@@ -220,7 +330,7 @@ class Parser:
         Executes the power operation.
         :return: BinOpNode from the resulting operation.
         """
-        return self.binary_operation(self.atom, [TP_POWER], self.factor)
+        return self.binary_operation(self.call, [TP_POWER], self.factor)
 
     def term(self):
         """

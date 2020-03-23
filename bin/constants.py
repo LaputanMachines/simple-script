@@ -36,7 +36,8 @@ KEYWORDS = [
     'FOR',
     'TO',
     'STEP',
-    'WHILE'
+    'WHILE',
+    'FUNC'
 ]
 
 #################
@@ -62,6 +63,8 @@ TP_POWER = 'POWER'
 TP_EQUALS = 'EQ'
 TP_LPAREN = 'LPAREN'
 TP_RPAREN = 'RPAREN'
+TP_COMMA = 'COMMA'
+TP_ARROW = 'ARROW'
 
 ###############
 # COMPARISONS #
