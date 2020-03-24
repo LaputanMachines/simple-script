@@ -23,11 +23,12 @@ while True:
     input_stream = input('$ ')
 
     # Special terminal commands
-    if input_stream == 'exit':
-        print()  # Newline to separate content
+    if input_stream.startswith('exit'):
+        # print()  # Newline to separate content
         exit(0)  # Terminate from the shell
-    elif input_stream == 'debug':
+    elif input_stream.startswith('debug'):
         print_errors = not print_errors
+        print('DEBUG mode set to {}'.format(print_errors))
         continue
 
     result, error = simplescript.run('<stdin>', input_stream)
