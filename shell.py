@@ -28,7 +28,7 @@ while True:
     elif input_stream.startswith('DEBUG'):
         print_errors = not print_errors
         debug_toggle_message = 'ON' if print_errors else 'OFF'
-        print('DEBUG MODE IS {}\n'.format(debug_toggle_message))
+        print('DEBUG MODE IS {}'.format(debug_toggle_message))
         continue
 
     result, error = simplescript.run('<stdin>', input_stream)
