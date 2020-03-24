@@ -22,14 +22,18 @@ This will allow all error messages to be printed after any interpretation. This 
 The reason it's not enabled by default is that one of the principles of SimpleScript is to rarely stop you dead in your tracks. Error handling measures have been built to inform-if-needed, otherwise it will attempt to sally forth.
 
 ```BASIC
-$ debug
+$ DEBUG
+DEBUG MODE IS ON
+
+$ DEBUG
+DEBUG MODE IS OFF
 ```
 
 To exit the interactive shell, simply use the `exit` keyword. This will terminate your program and perform garbage collection.
 You'll be dumped back into the BASH terminal you launched from. 
 
 ```BASIC
-$ exit
+$ EXIT
 ```
 
 More specifically, garbage collection of the variables and functions you created and used will occur. All system variables and functions will return to their original state.
