@@ -212,6 +212,35 @@ $ list / -1
 Lists are useful in performing computations on data. For example, images can be expressed as arrays of integers. 
 Using SimpleScript, you can use this list representation to perform computations on the image by interacting with its respective list.
 
+## Strings
+
+Strings are essentially just lists of individual characters. In SimpleScript, you can define and operate on strings the same way you would in BASIC. 
+You can concatenate two or more strings together, and you can repeat strings by multiplying it with a number.
+
+```BASIC
+$ "This is a string!"
+This is a string!
+```
+
+```BASIC
+$ "I can start here, " + "and end here!"
+I can start here, and end here!
+```
+
+```BASIC
+$ "Echo! " * 5
+Echo! Echo! Echo! Echo! Echo! 
+```
+
+```BASIC
+$ FUNC welcome (name, repeat) -> "Welcome, " * repeat + name
+<function welcome>
+$ welcome ("Michael", 5)
+Welcome, Welcome, Welcome, Welcome, Welcome, Michael
+```
+
+You can set variables to equal strings and you can also write anonymous functions which perform actions on strings.
+
 ## Supported Comparison Operators
 
 The following comparison operators are supported in SimpleScript. They can be used in addition to variable assignment and function executions. This is due to how the interpreter understands the ASTs being generated. The result is that you can chain together long and complex comparisons without needing to stop to define anything.
