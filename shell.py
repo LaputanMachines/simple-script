@@ -35,6 +35,6 @@ while True:
 
     result, error = simplescript.run('<stdin>', input_stream)
     if result:
-        print(result)
+        print(repr(result))
     if error and print_errors:
         print(error)
