@@ -2,6 +2,7 @@
 """Represents Value superclass instances."""
 
 from bin.errors import ActiveRuntimeError
+from bin.runtime_result import RuntimeResult
 
 
 class Value:
@@ -46,3 +47,59 @@ class Value:
                                   self.start_pos,
                                   other.end_pos,
                                   self.context)
+
+    #######################################
+    # DEFAULT FUNCTIONS                   #
+    # CHILD CLASSES SHOULD OVERRIDE THESE #
+    #######################################
+
+    def add_to(self, other):
+        return None, self.illegal_operation(other)
+
+    def subtract_by(self, other):
+        return None, self.illegal_operation(other)
+
+    def multiply_by(self, other):
+        return None, self.illegal_operation(other)
+
+    def divide_by(self, other):
+        return None, self.illegal_operation(other)
+
+    def power_by(self, other):
+        return None, self.illegal_operation(other)
+
+    def get_comparison_eq(self, other):
+        return None, self.illegal_operation(other)
+
+    def get_comparison_ne(self, other):
+        return None, self.illegal_operation(other)
+
+    def get_comparison_lt(self, other):
+        return None, self.illegal_operation(other)
+
+    def get_comparison_gt(self, other):
+        return None, self.illegal_operation(other)
+
+    def get_comparison_lte(self, other):
+        return None, self.illegal_operation(other)
+
+    def get_comparison_gte(self, other):
+        return None, self.illegal_operation(other)
+
+    def anded_by(self, other):
+        return None, self.illegal_operation(other)
+
+    def ored_by(self, other):
+        return None, self.illegal_operation(other)
+
+    def notted(self, other):
+        return None, self.illegal_operation(other)
+
+    def execute(self, args):
+        return RuntimeResult().failure(self.illegal_operation())
+
+    def copy(self):
+        raise Exception('No copy method defined')
+
+    def is_true(self):
+        return False

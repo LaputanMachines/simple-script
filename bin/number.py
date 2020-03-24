@@ -133,6 +133,16 @@ class Number(Value):
         """
         return self.value != 0
 
+    def copy(self):
+        """
+        Makes a copy of the Number instance.
+        :return: A copy of the Number instance.
+        """
+        copy = Number(self.value)
+        copy.set_position(self.start_pos, self.end_pos)
+        copy.set_context(self.context)
+        return copy
+
     ###############################
     # ALL LOGICAL OPERATIONS      #
     # EVERY FUNCTION IS IDENTICAL #

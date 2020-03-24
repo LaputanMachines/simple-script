@@ -2,13 +2,12 @@
 """Represents the Interpreter mechanism."""
 
 from bin.constants import *
-from bin.context import Context
 from bin.errors import ActiveRuntimeError
+from bin.function import BaseFunction
 from bin.list import List
 from bin.number import Number
 from bin.runtime_result import RuntimeResult
-from bin.symbol_table import SymbolTable
-from bin.value import Value
+from bin.string import String
 
 
 class Interpreter:
@@ -132,6 +131,7 @@ class Interpreter:
                                                       node.start_pos,
                                                       node.end_pos,
                                                       context))
+        var_value = var_value.copy().set_position(node.start_pos, node.end_pos).set_context(context)
         return runtime_result.success(var_value)
 
     def visit_varassignnode(self, node, context):
@@ -273,6 +273,7 @@ class Interpreter:
         return_value = runtime_result.register(value_to_call.execute(args))
         if runtime_result.error:
             return runtime_result
+        return_value = return_value.copy().set_position(node.start_pos, node.end_pos).set_context(context)
         return runtime_result.success(return_value)
 
     def visit_listnode(self, node, context):
@@ -291,14 +292,24 @@ class Interpreter:
         return runtime_result.success(
             List(elements).set_context(context).set_position(node.start_pos, node.end_pos))
 
+    def visit_stringnode(self, node, context):
+        """
+        Visits the StringNode instance.
+        :param node: The StringNode instance.
+        :param context: The caller's Context instance.
+        :return: A String instance.
+        """
+        return RuntimeResult().success(
+            String(node.token.value).set_context(context).set_position(node.start_pos, node.end_pos))
 
-##########################################################
-# FUNCTION CLASS DEFINITION                              #
-# PLACED HERE BECAUSE EXEC() FUNC USES INTERPRETER       #
-# IMPLEMENTING THIS ELSEWHERE RESULTS IN CIRCULAR IMPORT #
-##########################################################
 
-class Function(Value):
+#############################################################
+# FUNCTION CLASS DEFINITION                                 #
+# PLACED HERE BECAUSE EXECUTE() FUNC USES INTERPRETER       #
+# IMPLEMENTING THIS ELSEWHERE RESULTS IN CIRCULAR IMPORT    #
+#############################################################
+
+class Function(BaseFunction):
     """Represents a Function instance."""
 
     def __init__(self, name, body_node, arg_names):
@@ -308,8 +319,7 @@ class Function(Value):
         :param body_node: Body Node instance of the function.
         :param arg_names: Argument names for the function.
         """
-        super().__init__()
-        self.name = name or '<anonymous>'
+        super().__init__(name)
         self.body_node = body_node
         self.arg_names = arg_names
 
@@ -324,26 +334,11 @@ class Function(Value):
         """
         runtime_result = RuntimeResult()
         interpreter = Interpreter()
-        new_context = Context(self.name, self.context, self.start_pos)
-        new_context.symbol_table = SymbolTable(new_context.parent_context.symbol_table)
-        if len(args) > len(self.arg_names):
-            return runtime_result.failure(ActiveRuntimeError(
-                'Too many arguments'.format(len(args) - len(self.arg_names)),
-                self.start_pos,
-                self.end_pos,
-                self.context))
-        if len(args) < len(self.arg_names):
-            return runtime_result.failure(ActiveRuntimeError(
-                'Too few arguments'.format(len(self.arg_names) - len(args)),
-                self.start_pos,
-                self.end_pos,
-                self.context))
-        for index in range(len(args)):
-            arg_name = self.arg_names[index]
-            arg_value = args[index]
-            arg_value.set_context(new_context)
-            new_context.symbol_table.set(arg_name, arg_value)
-        value = runtime_result.register(interpreter.visit(self.body_node, new_context))
+        exec_context = self.generate_new_context()
+        runtime_result.register(self.check_and_populate_args(self.arg_names, args, exec_context))
+        if runtime_result.error:
+            return runtime_result
+        value = runtime_result.register(interpreter.visit(self.body_node, exec_context))
         if runtime_result.error:
             return runtime_result
         return runtime_result.success(value)

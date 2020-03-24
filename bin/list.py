@@ -96,7 +96,7 @@ class List(Value):
         Returns a copy of the List instance.
         :return: Copy of List current instance.
         """
-        new_list = List(self.elements[:])
+        new_list = List(self.elements)
         new_list.set_position(self.start_pos, self.end_pos)
         new_list.set_context(self.context)
         return new_list

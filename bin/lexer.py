@@ -47,6 +47,8 @@ class Lexer:
             # Transform input stream into an identifier Token
             elif self.current_character in LETTERS:
                 tokens.append(self.make_identifier())
+            elif self.current_character == '"':
+                tokens.append(self.make_string())
 
             # All maths and grouping operators
             elif self.current_character == '+':
@@ -207,3 +209,27 @@ class Lexer:
         :return: Token with either a greater or a greater-than type.
         """
         return self.make_dual_use_token(TP_GT, TP_GTE)
+
+    def make_string(self):
+        """
+        Makes a string from the input stream.
+        :return: a Token representing a String.
+        """
+        string = ''
+        escape_character = False
+        pos_start = self.position.copy()
+        self.advance()
+        escape_characters = {'n': '\n', 't': '\t'}
+        while self.current_character is not None \
+                and (self.current_character != '"' or escape_character):
+            if escape_character:  # Try using provided escape character
+                string += escape_characters.get(self.current_character, self.current_character)
+            else:  # Check for other escape characters
+                if self.current_character == '\\':
+                    escape_character = True
+                else:
+                    string += self.current_character
+            self.advance()
+            escape_character = False
+        self.advance()
+        return Token(TP_STRING, string, pos_start, self.position)

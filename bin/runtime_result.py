@@ -18,9 +18,15 @@ class RuntimeResult:
         :param result: The result of a runtime encounter.
         :return: The value of the result.
         """
-        if result.error:
+        if isinstance(result, RuntimeResult):
             self.error = result.error
-        return result.value
+            return result.value
+        # Note: This hackish handling of the input types
+        #       is bad-practice and should be properly
+        #       resolved eventually. While this doesn't actually
+        #       cause any issues, it introduces confusion and
+        #       has the potential to break down the line. (#3)
+        return result
 
     def success(self, value):
         """

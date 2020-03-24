@@ -47,12 +47,18 @@ KEYWORDS = [
 DIGITS = digits
 LETTERS = ascii_letters
 
+##################
+# ALL DATA TYPES #
+##################
+
+TP_INT = 'INT'
+TP_FLOAT = 'FLOAT'
+TP_STRING = 'STRING'
+
 #############
 # ALL MATHS #
 #############
 
-TP_INT = 'INT'
-TP_FLOAT = 'FLOAT'
 TP_PLUS = 'PLUS'
 TP_MINUS = 'MINUS'
 TP_MUL = 'MUL'

@@ -99,6 +99,12 @@ class Parser:
             self.advance()
             return parse_result.success(NumberNode(token))
 
+        # Parse all strings
+        elif token.type == TP_STRING:
+            parse_result.register_advancement()
+            self.advance()
+            return parse_result.success(StringNode(token))
+
         # Parse all possible identifiers
         elif token.type == TP_IDENTIFIER:
             parse_result.register_advancement()

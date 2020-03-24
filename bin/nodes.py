@@ -191,3 +191,19 @@ class ListNode:
         self.element_nodes = element_nodes
         self.start_pos = start_pos
         self.end_pos = end_pos
+
+
+class StringNode:
+    """Represents a String instance."""
+
+    def __init__(self, token):
+        """
+        Initializes a StringNode instance.
+        :param token: Token with the string content.
+        """
+        self.token = token
+        self.start_pos = self.token.start_pos
+        self.end_pos = self.token.end_pos
+
+    def __repr__(self):
+        return '{}'.format(self.token)
