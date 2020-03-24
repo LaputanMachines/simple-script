@@ -1,4 +1,4 @@
-# SimpleScript Programming Language
+# SimpleScript Docs
 
 SimpleScript is an interpreted, BACIC-like programming language built with Python. It is small, clean, and powerful. 
 The language itself is straightforward and allows for cleaner-looking mathematical operations and data processing.
@@ -50,6 +50,30 @@ The following special variables have set values in the language. However, they _
 | Logical False | `FALSE` | 0 | Represents a False Boolean | 
 
 Note that since these values are stored in a symbol table, you can also define `true` as your own version of `TRUE`; the values of `TRUE` and `true` can be different if you want. SimpleScript will never tell you that you shouldn't reassign these special variables. Configure your program as you'd like.
+
+## Builtin Functions
+
+There are many builtin functions in SimpleScript. You can, of course, write your own. 
+But these can be quite useful. You can chain together many functions into much larger compound functions that include both user-defined and builtin functions.
+You can also redefine builtin functions on a per-program basis; your changes will not be saved to the interpreter. 
+
+| Function Name | SimpleScript Command | Description | Example |
+| --- | --- | --- | --- |
+| Print | `PRINT` | Prints strings of text | `PRINT("This is a string")` |
+| Print Return | `PRINT_RET` |  | `PRINT_RET(123)` |
+| Input | `INPUT` |Accepts input from the stream | `INPUT()` |
+| Input Int | `INPUT_INT` | Accepts integer input from the stream | `INPUT_INT()` |
+| Clear | `CLEAR`, `CLS` | Clears the terminal screen | `CLEAR()`, `CLS()` |
+| Is Number | `IS_NUM` | Return `TRUE` if argument is a number | `IS_NUM(123)` |
+| Is String | `IS_STR` | Returns `TRUE` if argument is a string | `IS_STR("This is a string")` |
+| Is List | `IS_LIST` | Returns `TRUE` if argument is a list | `IS_LIST([1, 2, 3])` |
+| Is Function | `IS_FUNC` | Returns `TRUE` if argument is a function | `IS_FUNC(PRINT)` |
+| Append | `APPEND` | Append value to a list | `APPEND(list, 5)` |
+| Pop | `POP` | Remove an element from a list by index | `POP(list, 3)` |
+| Extend | `EXTEND` | Concatenate two lists together | `EXTEND(list_a, list_b)` |
+
+E.g. if you set `PRINT` to add two numbers instead of printing strings, that change will only take effect in your current program. 
+The next time you run a SimpleScript program, `PRINT` will default back to printing strings.
 
 ## Supported Math Operators
 
