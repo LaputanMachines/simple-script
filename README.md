@@ -60,7 +60,7 @@ You can also redefine builtin functions on a per-program basis; your changes wil
 | Function Name | SimpleScript Command | Description | Example |
 | --- | --- | --- | --- |
 | Print | `PRINT` | Prints strings of text | `PRINT("This is a string")` |
-| Print Return | `PRINT_RET` |  | `PRINT_RET(123)` |
+| Print Return | `PRINT_RET` | Returns a String instance of the input value | `PRINT_RET(123)` |
 | Input | `INPUT` |Accepts input from the stream | `INPUT()` |
 | Input Int | `INPUT_INT` | Accepts integer input from the stream | `INPUT_INT()` |
 | Clear | `CLEAR`, `CLS` | Clears the terminal screen | `CLEAR()`, `CLS()` |
