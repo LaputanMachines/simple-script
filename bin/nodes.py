@@ -176,3 +176,18 @@ class CallNode:
             self.end_pos = self.arg_nodes[len(self.arg_nodes) - 1].end_pos
         else:  # Assume function has no arguments to call
             self.end_pos = self.node_to_call.end_pos
+
+
+class ListNode:
+    """Represents a list."""
+
+    def __init__(self, element_nodes, start_pos, end_pos):
+        """
+        Initializes a ListNode for lists.
+        :param element_nodes: Element Nodes in the list.
+        :param start_pos: Starting Position instance.
+        :param end_pos: Ending Position instance.
+        """
+        self.element_nodes = element_nodes
+        self.start_pos = start_pos
+        self.end_pos = end_pos

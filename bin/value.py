@@ -11,10 +11,10 @@ class Value:
         self.start_pos = None
         self.end_pos = None
         self.context = None
-        self.set_pos()
+        self.set_position()
         self.set_context()
 
-    def set_pos(self, start_pos=None, end_pos=None):
+    def set_position(self, start_pos=None, end_pos=None):
         """
         Sets the position values for a Value instance.
         :param start_pos: Starting position.

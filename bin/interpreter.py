@@ -4,6 +4,7 @@
 from bin.constants import *
 from bin.context import Context
 from bin.errors import ActiveRuntimeError
+from bin.list import List
 from bin.number import Number
 from bin.runtime_result import RuntimeResult
 from bin.symbol_table import SymbolTable
@@ -177,8 +178,9 @@ class Interpreter:
         Visits the ForNode for for-loops in the stream.
         :param node: Node of the for-loop.
         :param context: Context of the caller.
-        :return: None for success.
+        :return: List of evaluated values.
         """
+        elements = []
         runtime_result = RuntimeResult()
         start_value = runtime_result.register(self.visit(node.start_value_node, context))
         if runtime_result.error:
@@ -207,18 +209,20 @@ class Interpreter:
         while condition():
             context.symbol_table.set(node.var_name_token.value, Number(index))
             index += step_value.value
-            runtime_result.register(self.visit(node.body_node, context))
+            elements.append(runtime_result.register(self.visit(node.body_node, context)))
             if runtime_result.error:
                 return runtime_result
-        return runtime_result.success(None)
+        return runtime_result.success(
+            List(elements).set_context(context).set_position(node.start_pos, node.end_pos))
 
     def visit_whilenode(self, node, context):
         """
         Visits the WhileNode for while-loops in the stream.
         :param node: Node of the while-loop.
         :param context: Context of the caller.
-        :return: None for success.
+        :return: List of all evaluated results.
         """
+        elements = []
         runtime_result = RuntimeResult()
         while True:
             condition = runtime_result.register(self.visit(node.condition, context))
@@ -226,10 +230,11 @@ class Interpreter:
                 return runtime_result
             if not condition.is_true():
                 break
-            runtime_result.register(self.visit(node.body_node, context))
+            elements.append(runtime_result.register(self.visit(node.body_node, context)))
             if runtime_result.error:
                 return runtime_result
-        return runtime_result.success(None)
+        return runtime_result.success(
+            List(elements).set_context(context).set_position(node.start_pos, node.end_pos))
 
     def visit_funcdefnode(self, node, context):
         """
@@ -243,7 +248,7 @@ class Interpreter:
         body_node = node.body_node
         arg_names = [arg_name.value for arg_name in node.arg_name_tokens]
         func_node = Function(func_name, body_node, arg_names). \
-            set_context(context).set_pos(node.start_pos, node.end_pos)
+            set_context(context).set_position(node.start_pos, node.end_pos)
         if node.var_name_token:
             context.symbol_table.set(func_name, func_node)
         return runtime_result.success(func_node)
@@ -260,7 +265,7 @@ class Interpreter:
         value_to_call = runtime_result.register(self.visit(node.node_to_call, context))
         if runtime_result.error:
             return runtime_result
-        value_to_call = value_to_call.copy().set_pos(node.start_pos, node.end_pos)
+        value_to_call = value_to_call.copy().set_position(node.start_pos, node.end_pos)
         for arg_node in node.arg_nodes:
             args.append(runtime_result.register(self.visit(arg_node, context)))
             if runtime_result.error:
@@ -269,6 +274,22 @@ class Interpreter:
         if runtime_result.error:
             return runtime_result
         return runtime_result.success(return_value)
+
+    def visit_listnode(self, node, context):
+        """
+        Visits the ListNode instance.
+        :param node:  The ListNode instance.
+        :param context: The caller's context.
+        :return: List instance with all values.
+        """
+        elements = []
+        runtime_result = RuntimeResult()
+        for element_node in node.element_nodes:
+            elements.append(runtime_result.register(self.visit(element_node, context)))
+            if runtime_result.error:
+                return runtime_result
+        return runtime_result.success(
+            List(elements).set_context(context).set_position(node.start_pos, node.end_pos))
 
 
 ##########################################################
@@ -334,5 +355,5 @@ class Function(Value):
         """
         function_copy = Function(self.name, self.body_node, self.arg_names)
         function_copy.set_context(self.context)
-        function_copy.set_pos(self.start_pos, self.end_pos)
+        function_copy.set_position(self.start_pos, self.end_pos)
         return function_copy

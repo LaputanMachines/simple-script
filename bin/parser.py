@@ -122,6 +122,13 @@ class Parser:
                     self.current_token.start_pos,
                     self.current_token.end_pos))
 
+        # Parse all list statements
+        if token.type == TP_LSQUARE:
+            list_expr = parse_result.register(self.list_expr())
+            if parse_result.error:
+                return parse_result
+            return parse_result.success(list_expr)
+
         # Parse all if-statements
         elif token.matches(TP_KEYWORD, 'IF'):
             if_expr = parse_result.register(self.if_expr())
@@ -152,7 +159,7 @@ class Parser:
         # The InvalidSyntaxError will be raised if the Parser is
         # unable to properly parse the Token stream you provide
         return parse_result.failure(InvalidSyntaxError(
-            "Expected int, float, identifier, 'IF', 'FOR', 'WHILE', 'FUNC', '+', '-' or '('",
+            "Expected int, float, identifier, 'IF', 'FOR', 'WHILE', 'FUNC', '[', '+', '-' or '('",
             token.start_pos, token.end_pos,
         ))
 
@@ -294,6 +301,43 @@ class Parser:
         if parse_result.error:
             return parse_result
         return parse_result.success(FuncDefNode(var_name_token, arg_name_tokens, node_to_return))
+
+    def list_expr(self):
+        """
+        Parses a ListNode instance.
+        :return: A ListNode instance.
+        """
+        element_nodes = []
+        parse_result = ParseResult()
+        start_pos = self.current_token.start_pos.copy()
+        if self.current_token.type != TP_LSQUARE:
+            return parse_result.failure(InvalidSyntaxError('Expected "["',
+                                                           self.current_token.start_pos,
+                                                           self.current_token.end_pos))
+        parse_result.register_advancement()
+        self.advance()
+        if self.current_token.type == TP_RSQUARE:
+            parse_result.register_advancement()
+            self.advance()
+        else:  # Non-empty list detected
+            element_nodes.append(parse_result.register(self.expr()))
+            if parse_result.error:
+                return parse_result.failure(InvalidSyntaxError(
+                    'Expected "]", "VAR", "IF", "FOR", "WHILE", "FUNC", int, float, or identifier',
+                    self.current_token.start_pos, self.current_token.end_pos))
+            while self.current_token.type == TP_COMMA:
+                parse_result.register_advancement()
+                self.advance()
+                element_nodes.append(parse_result.register(self.expr()))
+                if parse_result.error:
+                    return parse_result
+            if self.current_token.type != TP_RSQUARE:
+                return parse_result.failure(InvalidSyntaxError('Expected ",", or "]"',
+                                                               self.current_token.start_pos,
+                                                               self.current_token.end_pos))
+            parse_result.register_advancement()
+            self.advance()
+        return parse_result.success(ListNode(element_nodes, start_pos, self.current_token.end_pos.copy()))
 
     ################################
     # ALL BINARY OPERATION PARSERS #

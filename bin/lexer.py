@@ -75,6 +75,12 @@ class Lexer:
             elif self.current_character == ')':
                 tokens.append(Token(TP_RPAREN, start_pos=self.position))
                 self.advance()
+            elif self.current_character == '[':
+                tokens.append(Token(TP_LSQUARE, start_pos=self.position))
+                self.advance()
+            elif self.current_character == ']':
+                tokens.append(Token(TP_RSQUARE, start_pos=self.position))
+                self.advance()
 
             # Comparison and boolean operators
             elif self.current_character == '!':
@@ -104,7 +110,7 @@ class Lexer:
                 return [], IllegalCharError('"' + illegal_character + '"', start_pos, self.position)
 
         # Mark end with EOF and return
-        tokens.append(Token(TP_EOF))
+        tokens.append(Token(TP_EOF, start_pos=self.position))
         return tokens, None
 
     def make_number(self):
