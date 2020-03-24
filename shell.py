@@ -23,12 +23,14 @@ while True:
     input_stream = input('$ ')
 
     # Special terminal commands
+    # Note: There are actual builtin functions
+    #       in the language. But these are only
+    #       relevant to the interactive shell, and
+    #       not any program executed from a file.
     if input_stream.startswith('EXIT'):
         exit(0)  # Terminate from the shell
     elif input_stream.startswith('DEBUG'):
         print_errors = not print_errors
-        debug_toggle_message = 'ON' if print_errors else 'OFF'
-        print('DEBUG MODE IS {}'.format(debug_toggle_message))
         continue
 
     result, error = simplescript.run('<stdin>', input_stream)
