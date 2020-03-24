@@ -17,6 +17,12 @@ class List(Value):
         super().__init__()
         self.elements = elements
 
+    def __str__(self):
+        # Note: Usually I use the format() function for formatting strings
+        #       but in this case, the harder-to-read f'' method is actually
+        #       faster. Unfortunately, this makes things harder to understand.
+        return f'{", ".join([str(element) for element in self.elements])}'
+
     def __repr__(self):
         # Note: Usually I use the format() function for formatting strings
         #       but in this case, the harder-to-read f'' method is actually
