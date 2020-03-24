@@ -152,6 +152,62 @@ $ y
 
 This kind of inline assignment is thanks to the interpretation of the abstract syntax tree (AST). Instead of searching line-by-line for variables to be assigned, SimpleScript simply treats the `VAR` keyword like a token that triggers the parsing of its sub-tree. In short, SimpleScript considers `VAR` definitions a higher priority than brackets in the BEDMAS order of operations.
 
+## Lists
+
+SimpleScript allows for lists to be defined. They are immutable, unlike Python lists. 
+You can define a list, add elements to a list, remove elements from a list, and join two lists together.
+Since lists are immutable, you'll need to leverage list joins and value extraction to obtain your resulting list. 
+
+```BASIC
+$ VAR list = [1, 2, 3, 4, 5]
+[1, 2, 3, 4, 5]
+```
+
+```BASIC 
+$ VAR list = [1, 2, 3]
+[1, 2, 3]
+list + [4, 5]
+[1, 2, 3, 4, 5]
+```
+
+```BASIC
+$ VAR list = [1, 2, 3, 4, 5]
+[1, 2, 3, 4, 5]
+$ VAR other_list = [6, 7, 8, 9, 0]
+[6, 7, 8, 9, 0]
+$ list * other_list
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+```
+
+```BASIC
+$ VAR list = [1, 2, 3, 4, 5]
+[1, 2, 3, 4, 5]
+$ list - 1
+[1, 3, 4, 5]
+$ list - 0
+[3, 4, 5]
+$ list - (-1)
+[3, 4]
+```
+
+You can get elements by-index in lists using the `/` operator. You can also use negative index values to fetch values from the ends of arrays. 
+As always, you can chain expressions together. For example, you can evaluate an expression that results in an index for the list. 
+
+```BASIC
+$ [1, 2, 3, 4, 5] / 0
+1
+```
+
+```BASIC
+$ VAR list = [1, 2, 3, 4, 5]
+[1, 2, 3, 4, 5]
+$ list / -1
+5
+```
+
+Lists are useful in performing computations on data. For example, images can be expressed as arrays of integers. 
+Using SimpleScript, you can use this list representation to perform computations on the image by interacting with its respective list.
+
 ## Supported Comparison Operators
 
 The following comparison operators are supported in SimpleScript. They can be used in addition to variable assignment and function executions. This is due to how the interpreter understands the ASTs being generated. The result is that you can chain together long and complex comparisons without needing to stop to define anything.
@@ -219,9 +275,15 @@ For-loops are control flows that execute a set number of times before terminatin
 SimpleScript follows the BASIC model of for-loops, where a loop condition are defined and a body expression is grouped up and executed. More simply, SimpleScript for-loops are formatted like for-loops in C.
 
 ```BASIC
+$ FOR i = 1 TO 10 THEN 2 ^ i
+[2, 4, 8, 16, 32, 64, 128, 256, 512]
+```
+
+```BASIC
 $ VAR x = 1
 1
 $ FOR i = 1 TO 5 THEN VAR x = x + i
+[2, 4, 7, 11]
 $ x
 11
 ```
@@ -230,6 +292,7 @@ $ x
 $ VAR y = 100
 100
 $ FOR i = 100 TO 0 STEP -1 THEN VAR y = y - i
+[0, -99, ... -4949, -4950]
 $ y
 -4950
 ```
@@ -238,6 +301,7 @@ $ y
 $ VAR z = 1  
 1
 $ IF 10 == (20 - 10) THEN FOR i = 0 TO 10 THEN VAR z = z + i
+[1, 2, 4, 7, 11, 16, 22, 29, 37, 46]
 $ z
 46
 ```
@@ -254,6 +318,7 @@ This allows us to repeat programs and expressions until we reach some desired go
 $ VAR x = 1
 1
 $ WHILE x < 10 THEN VAR x = x + 1
+[2, 3, 4, 5, 6, 7, 8, 9, 10]
 $ x
 10
 ```
@@ -262,6 +327,7 @@ $ x
 $ VAR y = 10
 10
 $ WHILE y > 0 AND (TRUE == 1) THEN VAR y = y - 2
+[8, 6, 4, 2, 0]
 $ y
 0
 ```
