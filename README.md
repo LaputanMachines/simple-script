@@ -44,6 +44,55 @@ $ EXIT
 More specifically, garbage collection of the variables and functions you created and used will occur. All system variables and functions will return to their original state.
 This means that if you overrode the system variable `FALSE` to the value `10`, for example, that it would be restored back to its default value of `0`.
 
+## Example Program
+
+Here is a small example program written in SimpleScript. It uses some of the language's features including loops, functions, and variables.
+SimpleScript is Turing-complete; the language is simple to use yet robust enough to handle whatever you throw at it.
+
+```BASIC
+###############################################################################
+# INSTRUCTIONS: To run this, type RUN("examples/example_program.simple") into #
+#               the interactive shell. Comments like these won't be executed. #
+###############################################################################
+
+# Function to prepends a prefix to the word
+FUNC function(prefix) -> prefix + "SimpleScript"
+
+# Join function for elements
+FUNC join(elements, separator)
+	VAR result = ""
+	VAR len = LEN(elements)
+	FOR i = 0 TO len THEN
+		VAR result = result + elements/i
+		IF i != len - 1 THEN VAR result = result + separator
+	END
+	RETURN result
+END
+
+# Maps elements to a function
+FUNC map(elements, func)
+	VAR new_elements = []
+	FOR i = 0 TO LEN(elements) THEN
+		APPEND(new_elements, func(elements/i))
+	END
+	RETURN new_elements
+END
+
+# Print using builtin function
+PRINT("Greetings universe!")
+
+# Loop example snippet
+FOR i = 0 TO 5 THEN
+	PRINT(join(map(["l", "sp"], function), ", "))
+END
+```
+
+For more detailed documentation, you can continue below. Every feature of SimpleScript is outlined in the documentation.
+If you encounter any issues, or feel like the language is missing something, you can [contribute to the project on GitHub](https://github.com/FlatlanderWoman/SimpleScript).
+Happy coding!
+
+---
+
 ## Special Variables
 
 The following special variables have set values in the language. However, they _can_ be remapped in your program. This is by design and allows your program to define its own basic terms and concepts.
