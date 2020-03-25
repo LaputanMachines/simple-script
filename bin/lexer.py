@@ -45,6 +45,10 @@ class Lexer:
                 tokens.append(Token(TP_NEWLINE, start_pos=self.position))
                 self.advance()
 
+            # Handle all comments
+            elif self.current_character == '#':
+                self.skip_comment()
+
             # Transform input stream into a number Token
             elif self.current_character in DIGITS:
                 tokens.append(self.make_number())
@@ -242,3 +246,14 @@ class Lexer:
             escape_character = False
         self.advance()
         return Token(TP_STRING, string, start_pos, self.position)
+
+    def skip_comment(self):
+        """
+        Skips all comments in the stream.
+        All text to the right of a '#' character is a
+        comment and will be completely skipped over.
+        """
+        self.advance()
+        while self.current_character != '\n':
+            self.advance()
+        self.advance()
