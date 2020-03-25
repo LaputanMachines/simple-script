@@ -517,6 +517,19 @@ Working well
 This same rule applies to all other loops and control flow operations. Same goes for functions. 
 You write longer, more complex programs by chaining together multiple operations in loops and function bodies.
 
+## Comments
+
+Comments are simply anything to the right of a `#` character. There are no multi-line comments in SimpleScript.
+
+```BASIC
+$ # This is a comment! 
+$ # I will not be executed!
+``` 
+
+Comments are for personal use. The interpreter will simply skip over them. 
+It is a personal preference when and where to use comments. There is no standard way of using them, as the underlying language itself doesn't care about them.
+Do whatever brings you joy.
+
 ---
 
 ## Language Grammars
