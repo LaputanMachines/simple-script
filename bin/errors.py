@@ -20,6 +20,9 @@ class Error:
         self.start_pos = start_pos
         self.end_pos = end_pos
 
+    def __str__(self):
+        return repr(self)
+
     def __repr__(self):
         """Pretty-print error message."""
         error_msg = '\nFile {}, on line {}\n'.format(self.start_pos.fn, self.start_pos.ln + 1)
@@ -27,6 +30,11 @@ class Error:
         error_msg += '\n' + string_with_arrows(self.start_pos.ftxt, self.start_pos, self.end_pos) + '\n'
         return error_msg
 
+
+##################################################
+# ALL POSSIBLE ERRORS DURING EXECUTION           #
+# NO DOCSTRINGS BECAUSE ALL CLASSES ARE THE SAME #
+##################################################
 
 class IllegalCharError(Error):
     def __init__(self, details, start_pos, end_pos):

@@ -58,7 +58,7 @@ class Interpreter:
         runtime_result = RuntimeResult()
         left_node = runtime_result.register(self.visit(node.left_node, context))
         right_node = runtime_result.register(self.visit(node.right_node, context))
-        if runtime_result.error:
+        if runtime_result.should_return():
             return runtime_result
         if node.op_token.type == TP_PLUS:
             result, error = left_node.add_to(right_node)
@@ -90,7 +90,7 @@ class Interpreter:
             result, error = left_node.anded_by(right_node)
         elif node.op_token.matches(TP_KEYWORD, 'OR'):
             result, error = left_node.ored_by(right_node)
-        if runtime_result.error:
+        if runtime_result.should_return():
             return runtime_result.failure(runtime_result)
         if error:
             return runtime_result.failure(error)
@@ -106,7 +106,7 @@ class Interpreter:
         error = None
         runtime_result = RuntimeResult()
         number = runtime_result.register(self.visit(node.right_node, context))
-        if runtime_result.error:
+        if runtime_result.should_return():
             return runtime_result
         if node.op_token.type == TP_MINUS:
             number, error = number.multiply_by(Number(-1))
@@ -126,7 +126,7 @@ class Interpreter:
         runtime_result = RuntimeResult()
         var_name = node.var_name.value
         var_value = context.symbol_table.get(var_name)
-        if not var_value:
+        if var_value is None:
             runtime_result.failure(ActiveRuntimeError('VAR "{}" not defined'.format(var_name),
                                                       node.start_pos,
                                                       node.end_pos,
@@ -144,7 +144,7 @@ class Interpreter:
         runtime_result = RuntimeResult()
         var_name = node.var_name.value
         var_value = runtime_result.register(self.visit(node.value_node, context))
-        if runtime_result.error:
+        if runtime_result.should_return():
             return runtime_result
         context.symbol_table.set(var_name, var_value)
         return runtime_result.success(var_value)
@@ -159,17 +159,17 @@ class Interpreter:
         runtime_result = RuntimeResult()
         for condition, expr, should_return_null in node.cases:
             condition_value = runtime_result.register(self.visit(condition, context))
-            if runtime_result.error:
+            if runtime_result.should_return():
                 return runtime_result
             if condition_value.is_true():
                 expr_value = runtime_result.register(self.visit(expr, context))
-                if runtime_result.error:
+                if runtime_result.should_return():
                     return runtime_result
                 return runtime_result.success(Number(0) if should_return_null else expr_value)
         if node.else_case:
             expr, should_return_null = node.else_case
             expr_value = runtime_result.register(self.visit(expr, context))
-            if runtime_result.error:
+            if runtime_result.should_return():
                 return runtime_result
             return runtime_result.success(Number(0) if should_return_null else expr_value)
         return runtime_result.success(Number(0))
@@ -184,14 +184,14 @@ class Interpreter:
         elements = []
         runtime_result = RuntimeResult()
         start_value = runtime_result.register(self.visit(node.start_value_node, context))
-        if runtime_result.error:
+        if runtime_result.should_return():
             return runtime_result
         end_value = runtime_result.register(self.visit(node.end_value_node, context))
-        if runtime_result.error:
+        if runtime_result.should_return():
             return runtime_result
         if node.step_value_node:
             step_value = runtime_result.register(self.visit(node.step_value_node, context))
-            if runtime_result.error:
+            if runtime_result.should_return():
                 return runtime_result
         else:  # Default to one iteration
             step_value = Number(1)
@@ -210,9 +210,16 @@ class Interpreter:
         while condition():
             context.symbol_table.set(node.var_name_token.value, Number(index))
             index += step_value.value
-            elements.append(runtime_result.register(self.visit(node.body_node, context)))
-            if runtime_result.error:
+            current_value = runtime_result.register(self.visit(node.body_node, context))
+            if runtime_result.should_return() \
+                    and runtime_result.loop_should_continue is False \
+                    and runtime_result.loop_should_break is False:
                 return runtime_result
+            if runtime_result.loop_should_continue:
+                continue
+            if runtime_result.loop_should_break:
+                break
+            elements.append(current_value)
         return runtime_result.success(
             Number(0) if node.should_return_null else
             List(elements).set_context(context).set_position(node.start_pos, node.end_pos))
@@ -228,13 +235,20 @@ class Interpreter:
         runtime_result = RuntimeResult()
         while True:
             condition = runtime_result.register(self.visit(node.condition, context))
-            if runtime_result.error:
+            if runtime_result.should_return():
                 return runtime_result
             if not condition.is_true():
                 break
-            elements.append(runtime_result.register(self.visit(node.body_node, context)))
-            if runtime_result.error:
+            current_value = runtime_result.register(self.visit(node.body_node, context))
+            if runtime_result.should_return() \
+                    and runtime_result.loop_should_continue is False \
+                    and runtime_result.loop_should_break is False:
                 return runtime_result
+            if runtime_result.loop_should_continue:
+                continue
+            if runtime_result.loop_should_break:
+                break
+            elements.append(current_value)
         return runtime_result.success(
             Number(0) if node.should_return_null else
             List(elements).set_context(context).set_position(node.start_pos, node.end_pos))
@@ -250,8 +264,8 @@ class Interpreter:
         func_name = node.var_name_token.value if node.var_name_token else None
         body_node = node.body_node
         arg_names = [arg_name.value for arg_name in node.arg_name_tokens]
-        func_node = Function(func_name, body_node, arg_names, node.should_return_null). \
-            set_context(context).set_position(node.start_pos, node.end_pos)
+        func_node = Function(func_name, body_node, arg_names, node.should_auto_return) \
+            .set_context(context).set_position(node.start_pos, node.end_pos)
         if node.var_name_token:
             context.symbol_table.set(func_name, func_node)
         return runtime_result.success(func_node)
@@ -266,15 +280,15 @@ class Interpreter:
         args = []
         runtime_result = RuntimeResult()
         value_to_call = runtime_result.register(self.visit(node.node_to_call, context))
-        if runtime_result.error:
+        if runtime_result.should_return():
             return runtime_result
         value_to_call = value_to_call.copy().set_position(node.start_pos, node.end_pos)
         for arg_node in node.arg_nodes:
             args.append(runtime_result.register(self.visit(arg_node, context)))
-            if runtime_result.error:
+            if runtime_result.should_return():
                 return runtime_result
         return_value = runtime_result.register(value_to_call.execute(args))
-        if runtime_result.error:
+        if runtime_result.should_return():
             return runtime_result
         return_value = return_value.copy().set_position(node.start_pos, node.end_pos).set_context(context)
         return runtime_result.success(return_value)
@@ -290,7 +304,7 @@ class Interpreter:
         runtime_result = RuntimeResult()
         for element_node in node.element_nodes:
             elements.append(runtime_result.register(self.visit(element_node, context)))
-            if runtime_result.error:
+            if runtime_result.should_return():
                 return runtime_result
         return runtime_result.success(
             List(elements).set_context(context).set_position(node.start_pos, node.end_pos))
@@ -305,6 +319,40 @@ class Interpreter:
         return RuntimeResult().success(
             String(node.token.value).set_context(context).set_position(node.start_pos, node.end_pos))
 
+    def visit_returnnode(self, node, context):
+        """
+        Visits the ReturnNode instance.
+        :param node: The ReturnNode instance.
+        :param context: The caller's context.
+        :return: Value of the ReturnNode instance.
+        """
+        runtime_result = RuntimeResult()
+        if node.node_to_return:
+            value = runtime_result.register(self.visit(node.node_to_return, context))
+            if runtime_result.should_return():
+                return runtime_result
+        else:
+            value = Number(0)
+        return runtime_result.success_return(value)
+
+    def visit_continuenode(self, node, context):
+        """
+        Visits the ContinueNode instance.
+        :param node: The ContinueNode instance.
+        :param context: The caller's context.
+        :return: The RuntimeResult of a successful CONTINUE.
+        """
+        return RuntimeResult().success_continue()
+
+    def visit_breaknode(self, node, context):
+        """
+        Visits the BreakNode instance.
+        :param node: The BreakNode instance.
+        :param context: The caller's context.
+        :return: The RuntimeResult of a successful BREAK.
+        """
+        return RuntimeResult().success_break()
+
 
 #############################################################
 # FUNCTION CLASS DEFINITION                                 #
@@ -315,18 +363,18 @@ class Interpreter:
 class Function(BaseFunction):
     """Represents a Function instance."""
 
-    def __init__(self, name, body_node, arg_names, should_return_null):
+    def __init__(self, name, body_node, arg_names, should_auto_return):
         """
         Initializes a Function instance.
         :param name: Name of the function.
         :param body_node: Body Node instance of the function.
         :param arg_names: Argument names for the function.
-        :param should_return_null: True if the Function should return NULL.
+        :param should_auto_return: True if the Function should automatically return its value.
         """
         super().__init__(name)
         self.body_node = body_node
         self.arg_names = arg_names
-        self.should_return_null = should_return_null
+        self.should_auto_return = should_auto_return
 
     def __repr__(self):
         return '<function {}>'.format(self.name)
@@ -341,19 +389,21 @@ class Function(BaseFunction):
         interpreter = Interpreter()
         exec_context = self.generate_new_context()
         runtime_result.register(self.check_and_populate_args(self.arg_names, args, exec_context))
-        if runtime_result.error:
+        if runtime_result.should_return():
             return runtime_result
         value = runtime_result.register(interpreter.visit(self.body_node, exec_context))
-        if runtime_result.error:
+        if runtime_result.should_return() and runtime_result.func_return_value is None:
             return runtime_result
-        return runtime_result.success(Number(0) if self.should_return_null else value)
+        return_value \
+            = (value if self.should_auto_return else None) or runtime_result.func_return_value or Number(0)
+        return runtime_result.success(return_value)
 
     def copy(self):
         """
         Copies a Function instance.
         :return: A new Function instance.
         """
-        function_copy = Function(self.name, self.body_node, self.arg_names, self.should_return_null)
+        function_copy = Function(self.name, self.body_node, self.arg_names, self.should_auto_return)
         function_copy.set_context(self.context)
         function_copy.set_position(self.start_pos, self.end_pos)
         return function_copy

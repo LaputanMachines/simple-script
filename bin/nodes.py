@@ -144,19 +144,19 @@ class WhileNode:
 class FuncDefNode:
     """Represents a function definition."""
 
-    def __init__(self, var_name_token, arg_name_tokens, body_node, should_return_null):
+    def __init__(self, var_name_token, arg_name_tokens, body_node, should_auto_return):
         """
         Initializes a FuncDefNode for functions in stream.
         :param var_name_token: Name of the function to create.
         :param arg_name_tokens: Argument Tokens for the function.
         :param body_node: Expression assigned to new function.
-        :param should_return_null: True if the FuncDefNode should return NULL.
+        :param should_auto_return: True if the FuncDefNode should return the value automatically..
         """
         self.var_name_token = var_name_token
         self.arg_name_tokens = arg_name_tokens
         self.body_node = body_node
         self.start_pos = None
-        self.should_return_null = should_return_null
+        self.should_auto_return = should_auto_return
         if self.var_name_token:
             self.start_pos = self.var_name_token.start_pos
         elif len(self.arg_name_tokens) > 0:
@@ -214,3 +214,44 @@ class StringNode:
 
     def __repr__(self):
         return '{}'.format(self.token)
+
+
+class ReturnNode:
+    """Represents an instance of the RETURN function."""
+
+    def __init__(self, node_to_return, start_pos, end_pos):
+        """
+        Initializes a ReturnNode instance.
+        :param node_to_return: Node we wish to return.
+        :param start_pos: Starting Position of the Node.
+        :param end_pos: Ending Position of the Node.
+        """
+        self.node_to_return = node_to_return
+        self.start_pos = start_pos
+        self.end_pos = end_pos
+
+
+class ContinueNode:
+    """Represents an instance of the CONTINUE function."""
+
+    def __init__(self, start_pos, end_pos):
+        """
+        Initializes a ContinueNode instance.
+        :param start_pos: Starting Position instance.
+        :param end_pos: Ending Position instance.
+        """
+        self.start_pos = start_pos
+        self.end_pos = end_pos
+
+
+class BreakNode:
+    """Represents an instance of the BREAK function."""
+
+    def __init__(self, start_pos, end_pos):
+        """
+        Initializes a BreakNode instance.
+        :param start_pos: Starting Position instance.
+        :param end_pos: Ending Position instance.
+        """
+        self.start_pos = start_pos
+        self.end_pos = end_pos

@@ -226,7 +226,7 @@ class Lexer:
         """
         string = ''
         escape_character = False
-        pos_start = self.position.copy()
+        start_pos = self.position.copy()
         self.advance()
         escape_characters = {'n': '\n', 't': '\t'}
         while self.current_character is not None \
@@ -241,4 +241,4 @@ class Lexer:
             self.advance()
             escape_character = False
         self.advance()
-        return Token(TP_STRING, string, pos_start, self.position)
+        return Token(TP_STRING, string, start_pos, self.position)
