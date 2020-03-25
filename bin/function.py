@@ -62,8 +62,7 @@ class BaseFunction(Value):
                 self.context))
         return runtime_result.success(None)
 
-    @staticmethod
-    def populate_args(arg_names, args, exec_context):
+    def populate_args(self, arg_names, args, exec_context):
         """
         Populates the args for a given Context.
         :param arg_names: Name of all args.

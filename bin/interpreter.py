@@ -157,7 +157,7 @@ class Interpreter:
         :return: Value of the if-statement, or None.
         """
         runtime_result = RuntimeResult()
-        for condition, expr in node.cases:
+        for condition, expr, should_return_null in node.cases:
             condition_value = runtime_result.register(self.visit(condition, context))
             if runtime_result.error:
                 return runtime_result
@@ -165,13 +165,14 @@ class Interpreter:
                 expr_value = runtime_result.register(self.visit(expr, context))
                 if runtime_result.error:
                     return runtime_result
-                return runtime_result.success(expr_value)
+                return runtime_result.success(Number(0) if should_return_null else expr_value)
         if node.else_case:
-            else_value = runtime_result.register(self.visit(node.else_case, context))
+            expr, should_return_null = node.else_case
+            expr_value = runtime_result.register(self.visit(expr, context))
             if runtime_result.error:
                 return runtime_result
-            return runtime_result.success(else_value)
-        return runtime_result.success(None)
+            return runtime_result.success(Number(0) if should_return_null else expr_value)
+        return runtime_result.success(Number(0))
 
     def visit_fornode(self, node, context):
         """
@@ -213,6 +214,7 @@ class Interpreter:
             if runtime_result.error:
                 return runtime_result
         return runtime_result.success(
+            Number(0) if node.should_return_null else
             List(elements).set_context(context).set_position(node.start_pos, node.end_pos))
 
     def visit_whilenode(self, node, context):
@@ -234,6 +236,7 @@ class Interpreter:
             if runtime_result.error:
                 return runtime_result
         return runtime_result.success(
+            Number(0) if node.should_return_null else
             List(elements).set_context(context).set_position(node.start_pos, node.end_pos))
 
     def visit_funcdefnode(self, node, context):
@@ -247,7 +250,7 @@ class Interpreter:
         func_name = node.var_name_token.value if node.var_name_token else None
         body_node = node.body_node
         arg_names = [arg_name.value for arg_name in node.arg_name_tokens]
-        func_node = Function(func_name, body_node, arg_names). \
+        func_node = Function(func_name, body_node, arg_names, node.should_return_null). \
             set_context(context).set_position(node.start_pos, node.end_pos)
         if node.var_name_token:
             context.symbol_table.set(func_name, func_node)
@@ -312,16 +315,18 @@ class Interpreter:
 class Function(BaseFunction):
     """Represents a Function instance."""
 
-    def __init__(self, name, body_node, arg_names):
+    def __init__(self, name, body_node, arg_names, should_return_null):
         """
         Initializes a Function instance.
         :param name: Name of the function.
         :param body_node: Body Node instance of the function.
         :param arg_names: Argument names for the function.
+        :param should_return_null: True if the Function should return NULL.
         """
         super().__init__(name)
         self.body_node = body_node
         self.arg_names = arg_names
+        self.should_return_null = should_return_null
 
     def __repr__(self):
         return '<function {}>'.format(self.name)
@@ -341,14 +346,14 @@ class Function(BaseFunction):
         value = runtime_result.register(interpreter.visit(self.body_node, exec_context))
         if runtime_result.error:
             return runtime_result
-        return runtime_result.success(value)
+        return runtime_result.success(Number(0) if self.should_return_null else value)
 
     def copy(self):
         """
         Copies a Function instance.
         :return: A new Function instance.
         """
-        function_copy = Function(self.name, self.body_node, self.arg_names)
+        function_copy = Function(self.name, self.body_node, self.arg_names, self.should_return_null)
         function_copy.set_context(self.context)
         function_copy.set_position(self.start_pos, self.end_pos)
         return function_copy

@@ -40,6 +40,11 @@ class Lexer:
             if self.current_character in chars_to_skip:
                 self.advance()  # Skip useless chars
 
+            # Tokenize all line endings
+            elif self.current_character in [';', '\n']:
+                tokens.append(Token(TP_NEWLINE, start_pos=self.position))
+                self.advance()
+
             # Transform input stream into a number Token
             elif self.current_character in DIGITS:
                 tokens.append(self.make_number())
@@ -114,6 +119,10 @@ class Lexer:
         # Mark end with EOF and return
         tokens.append(Token(TP_EOF, start_pos=self.position))
         return tokens, None
+
+    #################################
+    # ALL MAKE FUNCTION DEFINITIONS #
+    #################################
 
     def make_number(self):
         """

@@ -9,6 +9,8 @@ class ParseResult:
         self.error = None
         self.node = None
         self.advance_count = 0
+        self.to_reverse_count = 0
+        self.last_registered_advance_count = 0
 
     def register(self, result):
         """
@@ -16,11 +18,13 @@ class ParseResult:
         :param result: Result of the parsing of Tokens.
         :return: Node extracted from the ParseResult.
         """
+        self.last_registered_advance_count = result.advance_count
+        self.advance_count += result.advance_count
         if isinstance(result, ParseResult):
             if result.error:
                 self.error = result.error
             return result.node
-        return result  # Already a Node
+        return result
 
     def success(self, node):
         """
@@ -41,4 +45,16 @@ class ParseResult:
         return self
 
     def register_advancement(self):
+        self.last_registered_advance_count = 1
         self.advance_count += 1
+
+    def try_register(self, result):
+        """
+        Tries to register a result instance.
+        :param result: Current ParseResult instance.
+        :return: The result of the register() call.
+        """
+        if result.error:
+            self.to_reverse_count = result.advance_count
+            return None  # Assume execution error
+        return self.register(result)

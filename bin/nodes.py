@@ -97,13 +97,14 @@ class IfNode:
         self.else_case = else_case
         self.start_pos = self.cases[0][0].start_pos
         self.end_pos = (self.else_case if self.else_case
-                        else self.cases[len(self.cases) - 1][0]).end_pos
+                        else self.cases[len(self.cases) - 1])[0].end_pos
 
 
 class ForNode:
     """Represents a Node for for-loops."""
 
-    def __init__(self, var_name_token, start_value_node, end_value_node, step_value_node, body_node):
+    def __init__(self, var_name_token, start_value_node, end_value_node,
+                 step_value_node, body_node, should_return_null):
         """
         Initializes a ForNode for-loop statement.
         :param var_name_token: Name of the variable Token.
@@ -111,6 +112,7 @@ class ForNode:
         :param end_value_node: When to end the iteration.
         :param step_value_node: Value of each step in the loop.
         :param body_node: What gets evaluated on every iteration.
+        :param should_return_null: True if the ForNode should return NULL.
         """
         self.var_name_token = var_name_token
         self.start_value_node = start_value_node
@@ -119,37 +121,42 @@ class ForNode:
         self.body_node = body_node
         self.start_pos = self.var_name_token.start_pos
         self.end_pos = self.body_node.end_pos
+        self.should_return_null = should_return_null
 
 
 class WhileNode:
     """Represents a Node for while-loops."""
 
-    def __init__(self, condition, body_node):
+    def __init__(self, condition, body_node, should_return_null):
         """
         Initializes a WhileNode for while loops.
         :param condition: Condition with which to continue execution.
         :param body_node: What gets evaluated on every execution.
+        :param should_return_null: True if the WhileNode should return NULL.
         """
         self.condition = condition
         self.body_node = body_node
         self.start_pos = self.condition.start_pos
         self.end_pos = self.body_node.end_pos
+        self.should_return_null = should_return_null
 
 
 class FuncDefNode:
     """Represents a function definition."""
 
-    def __init__(self, var_name_token, arg_name_tokens, body_node):
+    def __init__(self, var_name_token, arg_name_tokens, body_node, should_return_null):
         """
         Initializes a FuncDefNode for functions in stream.
         :param var_name_token: Name of the function to create.
         :param arg_name_tokens: Argument Tokens for the function.
         :param body_node: Expression assigned to new function.
+        :param should_return_null: True if the FuncDefNode should return NULL.
         """
         self.var_name_token = var_name_token
         self.arg_name_tokens = arg_name_tokens
         self.body_node = body_node
         self.start_pos = None
+        self.should_return_null = should_return_null
         if self.var_name_token:
             self.start_pos = self.var_name_token.start_pos
         elif len(self.arg_name_tokens) > 0:

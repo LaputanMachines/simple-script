@@ -35,12 +35,32 @@ class Parser:
             self.current_token = self.tokens[self.token_idx]
         return self.current_token
 
+    def reverse(self, amount=1):
+        """
+        Reverses the advancement of the Parser.
+        :param amount: Amount to reverse by.
+        :return: The current Token instance.
+        """
+        self.token_idx -= amount
+        self.update_current_token()
+        return self.current_token
+
+    def update_current_token(self):
+        """
+        Updates the current Token instance using the IDX.
+        Use this after you update the advancement of Parser.
+        Only performs an update when Token doesn't match the IDX of
+        the list of Tokens it stores.
+        """
+        if len(self.tokens) > self.token_idx >= 0:
+            self.current_token = self.tokens[self.token_idx]
+
     def parse(self):
         """
         Triggers the parsing of the input stream.
         :return: Parser instance.
         """
-        parser = self.expr()
+        parser = self.statements()
         if not parser.error and self.current_token.type != TP_EOF:
             return parser.failure(InvalidSyntaxError(self.current_token.start_pos,
                                                      self.current_token.end_pos,
@@ -169,6 +189,45 @@ class Parser:
             token.start_pos, token.end_pos,
         ))
 
+    def statements(self):
+        """
+        Parse all lists of statements separated by newlines.
+        :return:
+        """
+        parse_result = ParseResult()
+        statements, more_statements = [], True
+        start_pos = self.current_token.start_pos.copy()
+        while self.current_token.type == TP_NEWLINE:
+            parse_result.register_advancement()
+            self.advance()
+        statement = parse_result.register(self.expr())
+        if parse_result.error:
+            return parse_result
+        statements.append(statement)
+        while True:
+            newline_count = 0
+            while self.current_token.type == TP_NEWLINE:
+                parse_result.register_advancement()
+                self.advance()
+                newline_count += 1
+            if newline_count == 0:
+                more_statements = False
+            if not more_statements:
+                # Note: Could break in the if-statement
+                #       above, but we'd run into trouble on
+                #       subsequent loops. Unless the following
+                #       statement also lacks newlines, the loop
+                #       would never terminate.
+                break
+            statement = parse_result.try_register(self.expr())
+            if not statement:
+                self.reverse(parse_result.to_reverse_count)
+                more_statements = False
+                continue
+            statements.append(statement)
+        return parse_result.success(
+            ListNode(statements, start_pos, self.current_token.end_pos.copy()))
+
     def factor(self):
         """
         Implements the FACTOR grammar.
@@ -219,18 +278,19 @@ class Parser:
         """
         parse_result = ParseResult()
         if self.current_token.matches(TP_KEYWORD, 'VAR'):
-            parse_result.register(self.advance())
+            parse_result.register_advancement()
+            self.advance()
             if self.current_token.type != TP_IDENTIFIER:
                 return parse_result.failure(InvalidSyntaxError('Expected identifier',
                                                                self.current_token.start_pos,
                                                                self.current_token.end_pos))
             var_name = self.current_token
-            parse_result.register(self.advance())
+            self.advance()
             if self.current_token.type != TP_EQUALS:
                 return parse_result.failure(InvalidSyntaxError('Expected "="',
                                                                self.current_token.start_pos,
                                                                self.current_token.end_pos))
-            parse_result.register(self.advance())
+            self.advance()
             expression = parse_result.register(self.expr())
             if parse_result.error:
                 return parse_result
@@ -250,25 +310,28 @@ class Parser:
         """
         parse_result = ParseResult()
         if not self.current_token.matches(TP_KEYWORD, 'FUNC'):
-            return parse_result.failure(InvalidSyntaxError('Expected "FUNC"',
-                                                           self.current_token.start_pos,
-                                                           self.current_token.end_pos))
+            return parse_result.failure(InvalidSyntaxError(
+                "Expected 'FUNC'",
+                self.current_token.pos_start,
+                self.current_token.pos_end))
         parse_result.register_advancement()
         self.advance()
-        var_name_token = None
         if self.current_token.type == TP_IDENTIFIER:
-            var_name_token = self.current_token
+            var_name_tok = self.current_token
             parse_result.register_advancement()
             self.advance()
             if self.current_token.type != TP_LPAREN:
-                return parse_result.failure(InvalidSyntaxError('Expected "("',
-                                                               self.current_token.start_pos,
-                                                               self.current_token.end_pos))
-        else:  # Assume no variable name is being used
+                return parse_result.failure(InvalidSyntaxError(
+                    "Expected '('",
+                    self.current_token.pos_start,
+                    self.current_token.pos_end))
+        else:
+            var_name_tok = None
             if self.current_token.type != TP_LPAREN:
-                return parse_result.failure(InvalidSyntaxError('Expected an identifier or "("',
-                                                               self.current_token.start_pos,
-                                                               self.current_token.end_pos))
+                return parse_result.failure(InvalidSyntaxError(
+                    "Expected identifier or '('",
+                    self.current_token.pos_start,
+                    self.current_token.pos_end))
         parse_result.register_advancement()
         self.advance()
         arg_name_tokens = []
@@ -280,33 +343,53 @@ class Parser:
                 parse_result.register_advancement()
                 self.advance()
                 if self.current_token.type != TP_IDENTIFIER:
-                    return parse_result.failure(InvalidSyntaxError('Expected an identifier.',
-                                                                   self.current_token.start_pos,
-                                                                   self.current_token.end_pos))
+                    return parse_result.failure(InvalidSyntaxError(
+                        "Expected identifier",
+                        self.current_token.pos_start,
+                        self.current_token.pos_end))
                 arg_name_tokens.append(self.current_token)
                 parse_result.register_advancement()
                 self.advance()
             if self.current_token.type != TP_RPAREN:
-                return parse_result.failure(InvalidSyntaxError('Expected "," or ")"',
-                                                               self.current_token.start_pos,
-                                                               self.current_token.end_pos))
-        else:  # No identifier present on declaration
+                return parse_result.failure(InvalidSyntaxError(
+                    "Expected ',' or ')'",
+                    self.current_token.pos_start,
+                    self.current_token.pos_end))
+        else:
             if self.current_token.type != TP_RPAREN:
-                return parse_result.failure(InvalidSyntaxError('Expected identifier or ")"',
-                                                               self.current_token.start_pos,
-                                                               self.current_token.end_pos))
+                return parse_result.failure(InvalidSyntaxError(
+                    "Expected identifier or ')'",
+                    self.current_token.pos_start,
+                    self.current_token.pos_end))
         parse_result.register_advancement()
         self.advance()
-        if self.current_token.type != TP_ARROW:
-            return parse_result.failure(InvalidSyntaxError('Expected "->"',
-                                                           self.current_token.start_pos,
-                                                           self.current_token.end_pos))
+        if self.current_token.type == TP_ARROW:
+            parse_result.register_advancement()
+            self.advance()
+            body = parse_result.register(self.expr())
+            if parse_result.error:
+                return parse_result
+            return parse_result.success(
+                FuncDefNode(var_name_tok, arg_name_tokens, body, False))
+        if self.current_token.type != TP_NEWLINE:
+            return parse_result.failure(InvalidSyntaxError(
+                "Expected '->' or NEWLINE",
+                self.current_token.pos_start,
+                self.current_token.pos_end))
         parse_result.register_advancement()
         self.advance()
-        node_to_return = parse_result.register(self.expr())
+        body = parse_result.register(self.statements())
         if parse_result.error:
             return parse_result
-        return parse_result.success(FuncDefNode(var_name_token, arg_name_tokens, node_to_return))
+        if not self.current_token.matches(TP_KEYWORD, 'END'):
+            return parse_result.failure(InvalidSyntaxError(
+                "Expected 'END'",
+                self.current_token.pos_start,
+                self.current_token.pos_end))
+        parse_result.register_advancement()
+        self.advance()
+        return parse_result.success(
+            FuncDefNode(var_name_tok, arg_name_tokens, body, True))
 
     def list_expr(self):
         """
@@ -410,50 +493,122 @@ class Parser:
         as well as one final else case (optional).
         :return: IfNode containing all cases and an else case.
         """
+        parse_result = ParseResult()
+        all_cases = parse_result.register(self.if_expr_cases('IF'))
+        if parse_result.error:
+            return parse_result
+        cases, else_case = all_cases
+        return parse_result.success(IfNode(cases, else_case))
+
+    def if_expr_b(self):
+        """
+        Return cases relating to the ELIF condition.
+        :return: Cases relating to the ELIF condition.
+        """
+        return self.if_expr_cases('ELIF')
+
+    def if_expr_c(self):
+        """
+        Returns cases relating to the ELSE condition.
+        :return: Cases relating to the ELSE condition.
+        """
+        else_case = None
+        parse_result = ParseResult()
+        if self.current_token.matches(TP_KEYWORD, 'ELSE'):
+            parse_result.register_advancement()
+            self.advance()
+            if self.current_token.type == TP_NEWLINE:
+                parse_result.register_advancement()
+                self.advance()
+                statements = parse_result.register(self.statements())
+                if parse_result.error:
+                    return parse_result
+                else_case = (statements, True)
+                if self.current_token.matches(TP_KEYWORD, 'END'):
+                    parse_result.register_advancement()
+                    self.advance()
+                else:
+                    return parse_result.failure(InvalidSyntaxError(
+                        "Expected 'END'",
+                        self.current_token.pos_start,
+                        self.current_token.pos_end))
+            else:
+                expr = parse_result.register(self.expr())
+                if parse_result.error:
+                    return parse_result
+                else_case = (expr, False)
+        return parse_result.success(else_case)
+
+    def if_expr_b_or_c(self):
+        """
+        Parse if-expr for non-primary loop conditions.
+        :return: Tuple with the primary and secondary cases.
+        """
         cases, else_case = [], None
         parse_result = ParseResult()
-        if not self.current_token.matches(TP_KEYWORD, 'IF'):
-            return parse_result.failure(InvalidSyntaxError('Expected "IF"',
-                                                           self.current_token.start_pos,
-                                                           self.current_token.end_pos))
+        if self.current_token.matches(TP_KEYWORD, 'ELIF'):
+            all_cases = parse_result.register(self.if_expr_b())
+            if parse_result.error:
+                return parse_result
+            cases, else_case = all_cases
+        else:
+            else_case = parse_result.register(self.if_expr_c())
+            if parse_result.error:
+                return parse_result
+        return parse_result.success((cases, else_case))
+
+    def if_expr_cases(self, case_keyword):
+        """
+        General function for all if-expr grammars.
+        :param case_keyword: Keyword for the if-case.
+        :return: Tuple with the primary case and the else case.
+        """
+        cases, else_case = [], None
+        parse_result = ParseResult()
+        if not self.current_token.matches(TP_KEYWORD, case_keyword):
+            return parse_result.failure(InvalidSyntaxError(
+                "Expected '{}'".format(case_keyword),
+                self.current_token.pos_start,
+                self.current_token.pos_end))
         parse_result.register_advancement()
         self.advance()
         condition = parse_result.register(self.expr())
         if parse_result.error:
             return parse_result
         if not self.current_token.matches(TP_KEYWORD, 'THEN'):
-            return parse_result.failure(InvalidSyntaxError('Expected "THEN"',
-                                                           self.current_token.start_pos,
-                                                           self.current_token.end_pos))
+            return parse_result.failure(InvalidSyntaxError(
+                f"Expected 'THEN'",
+                self.current_token.pos_start,
+                self.current_token.pos_end))
         parse_result.register_advancement()
         self.advance()
-        expr = parse_result.register(self.expr())
-        if parse_result.error:
-            return parse_result
-        cases.append((condition, expr))
-        while self.current_token.matches(TP_KEYWORD, 'ELIF'):
+        if self.current_token.type == TP_NEWLINE:
             parse_result.register_advancement()
             self.advance()
-            condition = parse_result.register(self.expr())
+            statements = parse_result.register(self.statements())
             if parse_result.error:
                 return parse_result
-            if not self.current_token.matches(TP_KEYWORD, 'THEN'):
-                return parse_result.failure(InvalidSyntaxError('Expected "THEN"',
-                                                               self.current_token.start_pos,
-                                                               self.current_token.end_pos))
-            parse_result.register_advancement()
-            self.advance()
+            cases.append((condition, statements, True))
+            if self.current_token.matches(TP_KEYWORD, 'END'):
+                parse_result.register_advancement()
+                self.advance()
+            else:
+                all_cases = parse_result.register(self.if_expr_b_or_c())
+                if parse_result.error:
+                    return parse_result
+                new_cases, else_case = all_cases
+                cases.extend(new_cases)
+        else:
             expr = parse_result.register(self.expr())
             if parse_result.error:
                 return parse_result
-            cases.append((condition, expr))
-        if self.current_token.matches(TP_KEYWORD, 'ELSE'):
-            parse_result.register_advancement()
-            self.advance()
-            else_case = parse_result.register(self.expr())
+            cases.append((condition, expr, False))
+            all_cases = parse_result.register(self.if_expr_b_or_c())
             if parse_result.error:
                 return parse_result
-        return parse_result.success(IfNode(cases, else_case))
+            new_cases, else_case = all_cases
+            cases.extend(new_cases)
+        return parse_result.success((cases, else_case))
 
     def for_expr(self):
         """
@@ -462,34 +617,37 @@ class Parser:
         """
         parse_result = ParseResult()
         if not self.current_token.matches(TP_KEYWORD, 'FOR'):
-            return parse_result.failure(InvalidSyntaxError('Expected "FOR"',
-                                                           self.current_token.start_pos,
-                                                           self.current_token.end_pos))
+            return parse_result.failure(InvalidSyntaxError(
+                "Expected 'FOR'",
+                self.current_token.pos_start,
+                self.current_token.pos_end))
         parse_result.register_advancement()
         self.advance()
         if self.current_token.type != TP_IDENTIFIER:
-            return parse_result.failure(InvalidSyntaxError('Expected an identifier.',
-                                                           self.current_token.start_pos,
-                                                           self.current_token.end_pos))
-        var_name_token = self.current_token
+            return parse_result.failure(InvalidSyntaxError(
+                "Expected identifier",
+                self.current_token.pos_start,
+                self.current_token.pos_end))
+        var_name = self.current_token
         parse_result.register_advancement()
         self.advance()
         if self.current_token.type != TP_EQUALS:
-            return parse_result.failure(InvalidSyntaxError('Expected "="',
-                                                           self.current_token.start_pos,
-                                                           self.current_token.end_pos))
+            return parse_result.failure(InvalidSyntaxError(
+                "Expected '='",
+                self.current_token.pos_start,
+                self.current_token.pos_end))
         parse_result.register_advancement()
         self.advance()
-        start_value_node = parse_result.register(self.expr())
+        start_value = parse_result.register(self.expr())
         if parse_result.error:
             return parse_result
         if not self.current_token.matches(TP_KEYWORD, 'TO'):
-            return parse_result.failure(InvalidSyntaxError('Expected "TO"',
-                                                           self.current_token.start_pos,
-                                                           self.current_token.end_pos))
+            return parse_result.failure(InvalidSyntaxError(
+                "Expected 'TO'",
+                self.current_token.pos_start, self.current_token.pos_end))
         parse_result.register_advancement()
         self.advance()
-        end_value_node = parse_result.register(self.expr())
+        end_value = parse_result.register(self.expr())
         if parse_result.error:
             return parse_result
         if self.current_token.matches(TP_KEYWORD, 'STEP'):
@@ -501,16 +659,30 @@ class Parser:
         else:
             step_value = None
         if not self.current_token.matches(TP_KEYWORD, 'THEN'):
-            return parse_result.failure(InvalidSyntaxError('Expected "THEN"',
-                                                           self.current_token.start_pos,
-                                                           self.current_token.end_pos))
+            return parse_result.failure(InvalidSyntaxError(
+                "Expected 'THEN'",
+                self.current_token.pos_start, self.current_token.pos_end))
         parse_result.register_advancement()
         self.advance()
+        if self.current_token.type == TP_NEWLINE:
+            parse_result.register_advancement()
+            self.advance()
+            body = parse_result.register(self.statements())
+            if parse_result.error:
+                return parse_result
+            if not self.current_token.matches(TP_KEYWORD, 'END'):
+                return parse_result.failure(InvalidSyntaxError(
+                    "Expected 'END'",
+                    self.current_token.pos_start, self.current_token.pos_end))
+            parse_result.register_advancement()
+            self.advance()
+            return parse_result.success(
+                ForNode(var_name, start_value, end_value, step_value, body, True))
         body = parse_result.register(self.expr())
         if parse_result.error:
             return parse_result
-        return parse_result.success(ForNode(var_name_token, start_value_node,
-                                            end_value_node, step_value, body))
+        return parse_result.success(
+            ForNode(var_name, start_value, end_value, step_value, body, False))
 
     def while_expr(self):
         """
@@ -519,21 +691,37 @@ class Parser:
         """
         parse_result = ParseResult()
         if not self.current_token.matches(TP_KEYWORD, 'WHILE'):
-            return parse_result.failure(InvalidSyntaxError('Expected "WHILE"',
-                                                           self.current_token.start_pos,
-                                                           self.current_token.end_pos))
+            return parse_result.failure(InvalidSyntaxError(
+                "Expected 'WHILE'",
+                self.current_token.pos_start,
+                self.current_token.pos_end))
         parse_result.register_advancement()
         self.advance()
         condition = parse_result.register(self.expr())
         if parse_result.error:
             return parse_result
         if not self.current_token.matches(TP_KEYWORD, 'THEN'):
-            return parse_result.failure(InvalidSyntaxError('Expected "THEN"',
-                                                           self.current_token.start_pos,
-                                                           self.current_token.end_pos))
+            return parse_result.failure(InvalidSyntaxError(
+                "Expected 'THEN'",
+                self.current_token.pos_start,
+                self.current_token.pos_end))
         parse_result.register_advancement()
         self.advance()
+        if self.current_token.type == TP_NEWLINE:
+            parse_result.register_advancement()
+            self.advance()
+            body = parse_result.register(self.statements())
+            if parse_result.error:
+                return parse_result
+            if not self.current_token.matches(TP_KEYWORD, 'END'):
+                return parse_result.failure(InvalidSyntaxError(
+                    "Expected 'END'",
+                    self.current_token.pos_start,
+                    self.current_token.pos_end))
+            parse_result.register_advancement()
+            self.advance()
+            return parse_result.success(WhileNode(condition, body, True))
         body = parse_result.register(self.expr())
         if parse_result.error:
             return parse_result
-        return parse_result.success(WhileNode(condition, body))
+        return parse_result.success(WhileNode(condition, body, False))

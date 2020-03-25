@@ -23,7 +23,6 @@ operations = {'>': operator.gt,
 
 TP_IDENTIFIER = 'IDENTIFIER'
 TP_KEYWORD = 'KEYWORD'
-TP_EOF = 'EOF'
 KEYWORDS = [
     'VAR',
     'AND',
@@ -37,7 +36,8 @@ KEYWORDS = [
     'TO',
     'STEP',
     'WHILE',
-    'FUNC'
+    'FUNC',
+    'END'
 ]
 
 #################
@@ -89,3 +89,10 @@ TP_LPAREN = 'LPAREN'
 TP_RPAREN = 'RPAREN'
 TP_LSQUARE = 'LSQUARE'
 TP_RSQUARE = 'RSQUARE'
+
+#############################
+# META-OPERATIONS AND FLAGS #
+#############################
+
+TP_EOF = 'EOF'
+TP_NEWLINE = 'NEWLINE'
