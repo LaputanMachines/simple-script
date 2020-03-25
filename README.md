@@ -66,7 +66,7 @@ You can also redefine builtin functions on a per-program basis; your changes wil
 | Is Function | `IS_FUNC` | Returns `TRUE` if argument is a function | `IS_FUNC(PRINT)` |
 | Append | `APPEND` | Append value to a list | `APPEND(list, 5)` |
 | Pop | `POP` | Remove an element from a list by index | `POP(list, 3)` |
-| Extend | `EXTEND` | Concatenate two lists together | `EXTEND(list_a, list_b)` |
+| Extend | `EXTEND` | Concatenate two lists together | `EXTEND(list_a, list_b)` | 
 
 E.g. if you set `PRINT` to add two numbers instead of printing strings, that change will only take effect in your current program. 
 The next time you run a SimpleScript program, `PRINT` will default back to printing strings.
@@ -288,6 +288,21 @@ No language would be complete without logical operators. These operate the same 
 
 These can be chained into variable definitions and other assignments and function declarations to evaluate the truth values of abstract statements. The underlying ASTs of these operations are built in such a way to be able to handle applications on abstract entities; you can apply these logical operators to any expression.
 
+## Supported Control Flow Operators
+
+SimpleScript allows you to add break, continue, return, and end commands in your loops and functions.
+They all work the same way they do in BASIC and Python. Here is a table describing each control flow operator.
+
+| Statement | SimpleScript Command | Description |
+| --- | --- | --- |
+| Return | `RETURN` | Tells the function to return something |
+| Break | `BREAK` | Breaks out of loops |
+| Continue | `CONTINUE` | Continues (skips) to next iteration in loop |
+| END | `END` | Delimit the end of a function or loop |
+
+You can add these control flow statements into your loops and functions the same way you would in BASIC or Python.
+Please read the relevant documentation section for examples.
+
 ## If-Statements
 
 You can make if-statements by using the `IF`, `ELSE`, and `ELIF` keywords. Pairing this with logical or comparison operators can allow for dynamic variable assignment.
@@ -359,6 +374,18 @@ $ z
 46
 ```
 
+You can take advantage of `BREAK` and `CONTINUE` commands to control the flow of your loops.
+As you can see from the following example, we can chain together multi-line for-loops that execute different control flow commands on certain values of `i`.
+
+```BASIC
+$ VAR a = []
+[]
+$ FOR i = 0 TO 10 THEN; IF i == 4 THEN CONTINUE ELIF i == 8 THEN BREAK; VAR a = a + i; END
+[0]
+$ a
+[0, 1, 2, 3, 5, 6, 7]
+```
+
 SimpleScript allows you to assign variables inline with your for-loop. This opens up the possibility for dynamic variable assignment depending on predefined contexts.
 The greatest benefit, however, is that because SimpleScript allows for mutations of variables, you can initialize a variable beforehand and then use it to perform meta-computations in the for-loop itself. 
 
@@ -383,6 +410,19 @@ $ WHILE y > 0 AND (TRUE == 1) THEN VAR y = y - 2
 [8, 6, 4, 2, 0]
 $ y
 0
+```
+
+Just like for-loops, control flow statements like `BREAK` and `CONTINUE` can be used to augment your while-loops.
+Here is the same example found in the previous section. Instead of using for-loops, we're going to get the same resulting list using while-loops.
+
+```BASIC
+$ VAR a = []; VAR i = 0
+[, 0]
+$ WHILE i < 10 THEN; VAR i = i + 1; IF i == 4 THEN CONTINUE; IF i == 8 THEN BREAK; VAR a = a + i; END
+[0]
+$ a
+[1, 2, 3, 5, 6, 7]
+
 ```
 
 Variables and sub-expressions can be chained together to form large compound conditions for your while-loop. The body of the loop can be similarly built. 
@@ -432,6 +472,13 @@ Traceback (most recent call last):
 File <stdin>, line 1, in <program>
 bad_func (1, 2, 3, 4)
 ^^^^^^^^^^^^^^^^^^^^
+```
+
+```BASIC
+$ FUNC test(); VAR foo = 5; RETURN foo; END
+[<function test>]
+$ test()
+[5]
 ```
 
 If `debug` is enabled, the interpreter will complain if you add too many or too few function parameters. You can also create anonymous functions (e.g. lambda functions in Python) using similar syntax.
