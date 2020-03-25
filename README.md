@@ -50,10 +50,11 @@ Here is a small example program written in SimpleScript. It uses some of the lan
 SimpleScript is Turing-complete; the language is simple to use yet robust enough to handle whatever you throw at it.
 
 ```BASIC
-###############################################################################
-# INSTRUCTIONS: To run this, type RUN("examples/example_program.simple") into #
-#               the interactive shell. Comments like these won't be executed. #
-###############################################################################
+############################################
+# Sample SimpleScript Program		   #
+# [bash]$ python3 shell.py		   #
+# [SimpleScript]$ RUN("my_program.simple") #
+############################################
 
 # Function to prepends a prefix to the word
 FUNC function(prefix) -> prefix + "SimpleScript"
