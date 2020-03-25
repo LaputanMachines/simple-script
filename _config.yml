@@ -1,1 +1,4 @@
 theme: jekyll-theme-leap-day
+title: "SimpleScript"
+description: "An interpreted, BASIC-like programming language."
+show_downloads: "true"
