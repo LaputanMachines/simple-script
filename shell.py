@@ -27,7 +27,9 @@ while True:
     #       in the language. But these are only
     #       relevant to the interactive shell, and
     #       not any program executed from a file.
-    if input_stream.startswith('EXIT'):
+    if input_stream.strip() == '':
+        continue
+    elif input_stream.startswith('EXIT'):
         exit(0)  # Terminate from the shell
     elif input_stream.startswith('DEBUG'):
         print_errors = not print_errors
