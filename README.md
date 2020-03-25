@@ -23,10 +23,6 @@ The reason it's not enabled by default is that one of the principles of SimpleSc
 
 ```BASIC
 $ DEBUG
-DEBUG MODE IS ON
-
-$ DEBUG
-DEBUG MODE IS OFF
 ```
 
 To exit the interactive shell, simply use the `exit` keyword. This will terminate your program and perform garbage collection.
@@ -451,6 +447,28 @@ $ anon_func (2, 3)
 
 Like variables and flow control loops, you can chain together large compound function calls inside smaller anonymous function declarations. 
 The interpreter's backend has been built to handle abstract layers of expressions and nesting; there is no restriction to the number of nested compound functions you can use.
+
+## Multi-line Statements
+
+You can chain multiple statements together using multiple lines. Not only does this clean up your program, but it allows you to execute more than one operation in loops. 
+Semi-colons are used to delimit newlines in your program. You can also write multi-line expressions in the interactive shell by using semi-colons.
+
+```BASIC
+$ VAR result = IF 5 == 5 THEN "Math is working well" ELSE "Not working"
+[Math is working well]
+$ result
+[Math is working well]
+```
+
+```BASIC
+$ IF 5 == (3 + 2) THEN; PRINT("Math is cool");PRINT("Working well") ELSE PRINT("Not working")
+Math is cool
+Working well
+[0]
+```
+
+This same rule applies to all other loops and control flow operations. Same goes for functions. 
+You write longer, more complex programs by chaining together multiple operations in loops and function bodies.
 
 ---
 
