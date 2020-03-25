@@ -17,6 +17,15 @@ In your BASH terminal, run the `shell.py` script using Python.
 $ python shell.py 
 ```
 
+You can run programs using the `RUN` builtin function in the interactive shell. 
+**There is no file extension defined for SimpleScript.** Feel free to name your file anything.
+The interpreter will attempt to run _all_ files executed, regardless of extension. 
+
+```BASH
+$ python shell.py
+$ RUN ("my_program.simple") 
+```
+
 By default, error messages are not displayed. To toggle the visibility of error messages, use the `debug` command.
 This will allow all error messages to be printed after any interpretation. This is handy for improving the language itself. It's also handy to see smaller syntax and execution errors that the interpreter may have encountered.
 The reason it's not enabled by default is that one of the principles of SimpleScript is to rarely stop you dead in your tracks. Error handling measures have been built to inform-if-needed, otherwise it will attempt to sally forth.
@@ -55,6 +64,7 @@ You can also redefine builtin functions on a per-program basis; your changes wil
 
 | Function Name | SimpleScript Command | Description | Example |
 | --- | --- | --- | --- |
+| Run | `RUN` | Runs a program | `RUN("my_program.simple")` |
 | Print | `PRINT` | Prints strings of text | `PRINT("This is a string")` |
 | Print Return | `PRINT_RET` | Returns a String instance of the input value | `PRINT_RET(123)` |
 | Input | `INPUT` |Accepts input from the stream | `INPUT()` |
