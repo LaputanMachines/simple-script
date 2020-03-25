@@ -21,15 +21,16 @@ class SymbolTable:
         self.symbols['TRUE'] = Number(1)
         self.symbols['FALSE'] = Number(0)
 
-    def get(self, variable_name):
+    def get(self, variable_name, default=None):
         """
         Get the variable value from the SymbolTable.
         :param variable_name: Name of variable whose value we wish to fetch.
+        :param default: Default value to return.
         :return: The value of the requested variable in memory.
         """
-        variable_value = self.symbols.get(variable_name, None)
+        variable_value = self.symbols.get(variable_name, default)
         if variable_value is None and self.parent:
-            variable_value = self.parent.get(variable_name, None)
+            variable_value = self.parent.get(variable_name, default)
         return variable_value
 
     def set(self, variable_name, variable_value):
