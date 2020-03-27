@@ -2,9 +2,6 @@
 
 SimpleScript is an interpreted, BACIC-like programming language built with Python. It is small, clean, and powerful. 
 The language itself is straightforward and allows for cleaner-looking mathematical operations and data processing.
-
-![SimpleScript Promotional Teaser](https://raw.githubusercontent.com/FlatlanderWoman/PersonalWebsite/master/assets/portfolio/SimpleScript.png)
-
 The SimpleScript language can he used in two ways: through direct commands in the interactive shell, and by executing complete programs. You can read more about both execution methods below. 
 
 ## Installation
